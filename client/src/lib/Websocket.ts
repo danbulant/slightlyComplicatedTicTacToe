@@ -226,10 +226,10 @@ export class WebsocketConnection extends EventTarget {
                     break;
                 }
                 case "leave": {
-                    const fast = this.fast.get(msg.name);
+                    const fast = this.fast.get(msg.client);
                     if (!fast) return;
                     fast.conn.close();
-                    this.fast.delete(msg.name);
+                    this.fast.delete(msg.client);
                     players.set(this.fast);
                     messages.update(t => { t.push({ author: " SYS ", content: `${msg.client} left`});return t})
                     break;

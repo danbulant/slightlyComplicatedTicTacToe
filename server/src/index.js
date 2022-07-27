@@ -156,7 +156,7 @@ require("uWebSockets.js")
                             client.connection.send(
                                 JSON.stringify({
                                     t: "leave",
-                                    name: client.name,
+                                    client: client.name,
                                 })
                             )
                         );
