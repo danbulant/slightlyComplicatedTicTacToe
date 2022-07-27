@@ -4,6 +4,24 @@
 		<meta charset="utf-8" />
 		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
 		<meta name="viewport" content="width=device-width" />
+        <style>
+            body, html {
+                margin: 0;
+                padding: 0;
+                height: 100vh;
+                width: 100vw;
+                overflow: hidden;
+                font-family: "Square", "Squareo", monospace;
+            }
+            @font-face {
+                font-family: 'Square';
+                src: url("/assets/Square.ttf") format("truetype");
+            }
+            @font-face {
+                font-family: 'Squareo';
+                src: url("/assets/Squareo.ttf") format("truetype");
+            }
+        </style>
 		%sveltekit.head%
 	</head>
 	<body>

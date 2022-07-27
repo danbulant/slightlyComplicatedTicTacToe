@@ -1,2 +1,14 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<script>
+    import Game from "$lib/view/game/game.svelte";
+    import List from "$lib/view/menu/list.svelte";
+    import NameChoose from "$lib/view/menu/nameChoose.svelte";
+    import { connection, room } from "$lib/Websocket";
+</script>
+
+{#if !$connection}
+    <NameChoose />
+{:else if !$room}
+    <List />
+{:else}
+    <Game />
+{/if}

@@ -126,7 +126,7 @@ class ConnectedClient extends EventTarget {
     }
 }
 
-class WebsocketConnection extends EventTarget {
+export class WebsocketConnection extends EventTarget {
     ws: WebSocket;
     fast: Map<string, ConnectedClient> = new Map();
     roomName: string | null = null;
@@ -140,9 +140,20 @@ class WebsocketConnection extends EventTarget {
     }
 
     connect() {
-        this.ws = new WebSocket("ws://" + location.hostname + ":8080");
-        this.ws.addEventListener("open", () => {
+        this.ws = new WebSocket("ws://" + location.hostname + ":8080/?name=" + encodeURIComponent(this.name));
+        this.ws.addEventListener("open", (e) => {
             console.log("WS ready");
+            this.refreshList();
+        });
+        this.ws.addEventListener("close", (e) => {
+            console.log("WS closed");
+            lastError.set(e.reason || "Connection closed");
+            connection.set(null);
+        });
+        this.ws.addEventListener("error", (e) => {
+            console.error("WS error");
+            lastError.set("Connection error");
+            connection.set(null);
         });
         this.ws.addEventListener("message", (e) => {
             const msg = JSON.parse(e.data);
@@ -193,32 +204,54 @@ class WebsocketConnection extends EventTarget {
                         }
                         this.fast.set(client, fast);
                     }
+                    // missing break on purpose
+                }
+                case "create": {
+                    this.roomName = msg.name;
+                    this.roomId = msg.id;
+                    room.set({
+                        name: msg.name,
+                        id: msg.id
+                    });
+                    break;
                 }
                 case "leave": {
                     const fast = this.fast.get(msg.name);
                     if (!fast) return;
                     fast.conn.close();
                     this.fast.delete(msg.name);
+                    break;
                 }
                 case "left": {
                     console.log("Left room successfully");
                     this.roomName = null;
                     this.roomId = null;
+                    room.set(null);
                     this.fast.forEach(connection => connection.conn.close());
                     this.fast = new Map();
+                    break;
                 }
                 case "list": {
                     list.set(msg.rooms);
+                    listLoading.set(false);
+                    break;
                 }
                 case "error": {
                     console.error(msg.e);
+                    lastError.set(msg.e);
+                    break;
                 }
             }
         });
     }
 
+    createGame(name: string) {
+        this.ws.send(JSON.stringify({ t: "create", name: name }));
+    }
+
     refreshList() {
         this.ws.send(JSON.stringify({ t: "list" }));
+        listLoading.set(true);
     }
 
     send(data: any) {
@@ -228,3 +261,6 @@ class WebsocketConnection extends EventTarget {
 
 export const connection: Writable<WebsocketConnection|null> = writable(null);
 export const list: Writable<{ id: string, name: string, count: number }[]|null> = writable(null);
+export const listLoading = writable(true);
+export const lastError: Writable<string> = writable("");
+export const room: Writable<{ name: string, id: string }|null> = writable(null);
