@@ -1,6 +1,7 @@
 <script lang="ts">
     import { connection, lastError, list, listLoading } from "$lib/Websocket";
     import { onMount } from "svelte";
+import Button from "../components/button.svelte";
 
     onMount(() => {
         let i = setInterval(() => {
@@ -35,6 +36,10 @@
         error = "Creating game...";
         $connection!.createGame(newGameName);
     }
+
+    function connect(game: { name: string, count: number }) {
+        $connection!.join(game.name);
+    }
 </script>
 
 {#if creatingGame}
@@ -44,8 +49,8 @@
             {error}
         </div>
         <div class="controls">
-            <button on:click={() => creatingGame = false}>CANCEL</button>
-            <button on:click={submit}>SUBMIT</button>
+            <Button on:click={() => creatingGame = false}>CANCEL</Button>
+            <Button on:click={submit}>SUBMIT</Button>
         </div>
     </dialog>
 {/if}
@@ -54,20 +59,20 @@
     <main>
         <div class="flex">
             <h1>Games - {$connection?.name}</h1>
-            <button on:click={() => creatingGame = true}>CREATE</button>
+            <Button on:click={() => creatingGame = true}>CREATE</Button>
         </div>
         <div class="status">
             {#if $listLoading} Loading... {/if}
         </div>
         <ul>
             {#if $list}
-                {#each $list as $game}
-                    <li class="flex">
+                {#each $list as game}
+                    <li class="flex" on:click={() => connect(game)}>
                         <span>
-                            {$game.name}
+                            {game.name}
                         </span>
                         <span>
-                            {$game.count}
+                            {game.count}
                         </span>
                     </li>
                 {/each}
@@ -133,19 +138,7 @@
         font-size: 1.5rem;
         cursor: pointer;
     }
-    button {
-        width: 10em;
-        height: 3em;
-        border: 1px solid #bd5ce6;
-        border-radius: 0;
-        padding: 0.5em;
-        font-size: 1.5rem;
-        border: 10px solid #bd5ce6;
-        background-color: #85E65C;
-        cursor: pointer;
-    }
-    button:active {
-        background-color: #bd5ce6;
-        color: #85E65C;
+    input {
+        font-family: inherit;
     }
 </style>
