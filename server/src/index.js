@@ -312,6 +312,9 @@ require("uWebSockets.js")
             clients.delete(ws);
         },
     })
+    .get("/*", (res, req) => {
+        res.writeStatus("200 OK").writeHeader("Content-Type", "text/plain").end("OK");
+    })
     .listen(PORT, () => {
         console.log(`Listening on port ${PORT}`);
     });
