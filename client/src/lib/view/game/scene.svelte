@@ -20,9 +20,14 @@
     function decreaseLives() {
         $connection!.setLives($gameData!.lives - 1);
     }
+    function keydown(e: KeyboardEvent) {
+        if(e.key === "KeyT") {
+            increaseScore();
+        }
+    }
 </script>
 
-<svelte:window on:resize={resize} />
+<svelte:window on:resize={resize} on:keydown={keydown}/>
 
 
 <canvas bind:this={canvas} on:click={increaseScore} on:contextmenu={decreaseLives} />
