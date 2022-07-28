@@ -21,6 +21,7 @@ class ConnectedClient extends EventTarget {
     state: RTCDataChannelState | null = null;
     readyState: number = 0;
     pings: number[] = [];
+    score: number = 0;
 
     constructor(public ws: WebsocketConnection, public name: string) {
         super();
@@ -83,6 +84,9 @@ class ConnectedClient extends EventTarget {
                     this.dispatchEvent(new FastEvent("message", msg.d));
                     messages.update(t => { t.push({ author: this.name, content: msg.d });return t})
                     break;
+                case "start":
+                    gameData.set({ score: 0 });
+                    // break not on purpose
                 default:
                     console.log("MSG", msg);
                     this.dispatchEvent(new FastEvent(msg.t, msg.d));
@@ -266,14 +270,26 @@ export class WebsocketConnection extends EventTarget {
 
     sendMessage(msg: string) {
         if (!this.roomName) return console.log("Not in a room");
-        for(const [, client] of this.fast) {
-            client.send({ t: "msg", d: msg });
-        }
+        this.broadcast({ t: "msg", d: msg });
         messages.update(t => { t.push({ author: this.name, content: msg }); return t });
+    }
+    broadcast(data: any) {
+        if (!this.roomName) return console.log("Not in a room");
+        for(const [, client] of this.fast) {
+            client.send(data);
+        }
     }
 
     createGame(name: string) {
         this.ws.send(JSON.stringify({ t: "create", name: name }));
+    }
+
+    startGame() {
+        if (!this.roomName) return console.log("Not in a room");
+        this.broadcast({ t: "start" });
+        for(const [, client] of this.fast) {
+            client.score = 0;
+        }
     }
 
     join(name: string) {
@@ -297,3 +313,4 @@ export const lastError: Writable<string> = writable("");
 export const room: Writable<{ name: string, host: string } | null> = writable(null);
 export const players: Writable<Map<string, ConnectedClient>> = writable(new Map);
 export const messages: Writable<{ author: string, content: string }[]> = writable([]);
+export const gameData: Writable<{ score: number }|null> = writable(null);

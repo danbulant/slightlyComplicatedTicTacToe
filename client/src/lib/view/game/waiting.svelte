@@ -2,7 +2,9 @@
 	import { connection, messages, players, room } from '$lib/Websocket';
 	import Button from '../components/button.svelte';
 
-	function startGame() {}
+	function startGame() {
+        
+    }
     let content = "";
     function sendMessage() {
         if(!content.length || content.length > 512) return;
@@ -61,7 +63,7 @@
 			{#if $room?.host === $connection?.name}
                 <Button on:click={() => startGame()}>START GAME</Button>
             {:else}
-                <Button>Ready</Button>
+                <Button disabled>WAIT TO START</Button>
 			{/if}
         </div>
 	</main>

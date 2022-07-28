@@ -1,5 +1,16 @@
 <script>
-    import Waiting from "./waiting.svelte";
+	import { gameData } from '$lib/Websocket';
+	import GameOverlay from './gameOverlay.svelte';
+	import Scene from './scene.svelte';
+	import TimedPrestartScreen from './timedPrestartScreen.svelte';
+	import Waiting from './waiting.svelte';
 </script>
 
-<Waiting />
+{#if !$gameData}
+	<Waiting />
+{:else}
+	<TimedPrestartScreen />
+	<GameOverlay>
+		<Scene />
+	</GameOverlay>
+{/if}

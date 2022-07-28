@@ -1,5 +1,8 @@
+<script>
+    export var disabled = false;
+</script>
 
-<button on:click><slot /></button>
+<button on:click {disabled}><slot /></button>
 
 <style>
     button {
@@ -17,5 +20,11 @@
     button:active {
         background-color: #bd5ce6;
         color: #85E65C;
+    }
+    button:disabled {
+        background-color: #85E65C;
+        color: #5f3172;
+        text-decoration: line-through;
+        cursor: not-allowed;
     }
 </style>
