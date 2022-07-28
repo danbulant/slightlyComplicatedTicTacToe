@@ -22,6 +22,8 @@ class ConnectedClient extends EventTarget {
     readyState: number = 0;
     pings: number[] = [];
     score: number = 0;
+    lives: number = 3;
+    lastScoreChange: number = 0;
 
     constructor(public ws: WebsocketConnection, public name: string) {
         super();
@@ -84,8 +86,17 @@ class ConnectedClient extends EventTarget {
                     this.dispatchEvent(new FastEvent("message", msg.d));
                     messages.update(t => { t.push({ author: this.name, content: msg.d });return t})
                     break;
+                case "lives":
+                    this.lives = msg.d;
+                    players.update(t => t);
+                    break;
+                case "score":
+                    this.score = msg.d;
+                    this.lastScoreChange = Date.now();
+                    players.update(t => t);
+                    break;
                 case "start":
-                    gameData.set({ score: 0 });
+                    gameData.set({ score: 0, lives: 3, lastScoreChange: 0 });
                     // break not on purpose
                 default:
                     console.log("MSG", msg);
@@ -236,6 +247,9 @@ export class WebsocketConnection extends EventTarget {
                     this.fast.delete(msg.client);
                     players.set(this.fast);
                     messages.update(t => { t.push({ author: " SYS ", content: `${msg.client} left`});return t})
+                    if(this.fast.size == 0) {
+                        gameData.set(null);
+                    }
                     break;
                 }
                 case "host": {
@@ -280,6 +294,17 @@ export class WebsocketConnection extends EventTarget {
         }
     }
 
+    setScore(score: number) {
+        if (!this.roomName) return console.log("Not in a room");
+        this.broadcast({ t: "score", d: score });
+        gameData.update(t => { t!.score = score; t!.lastScoreChange = Date.now(); return t});
+    }
+    setLives(lives: number) {
+        if (!this.roomName) return console.log("Not in a room");
+        this.broadcast({ t: "lives", d: lives });
+        gameData.update(t => { t!.lives = lives; return t});
+    }
+
     createGame(name: string) {
         this.ws.send(JSON.stringify({ t: "create", name: name }));
     }
@@ -290,6 +315,7 @@ export class WebsocketConnection extends EventTarget {
         for(const [, client] of this.fast) {
             client.score = 0;
         }
+        gameData.set({ score: 0, lives: 3, lastScoreChange: 0 });
     }
 
     join(name: string) {
@@ -313,4 +339,4 @@ export const lastError: Writable<string> = writable("");
 export const room: Writable<{ name: string, host: string } | null> = writable(null);
 export const players: Writable<Map<string, ConnectedClient>> = writable(new Map);
 export const messages: Writable<{ author: string, content: string }[]> = writable([]);
-export const gameData: Writable<{ score: number }|null> = writable(null);
+export const gameData: Writable<{ score: number, lives: number, lastScoreChange: number }|null> = writable(null);

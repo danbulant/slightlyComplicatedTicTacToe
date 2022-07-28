@@ -7,7 +7,7 @@
     onMount(() => {
         let i = setTimeout(() => {
             visible = false;
-        }, 3000);
+        }, 2000);
         return () => clearTimeout(i);
     });
 </script>

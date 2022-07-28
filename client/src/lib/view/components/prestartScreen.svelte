@@ -79,7 +79,7 @@
 		transform: rotate3d(1, 0, 0, 0deg);
 		transform-style: preserve-3d;
 		box-sizing: border-box;
-		animation: dice 1.8s 0.7s ease-in-out;
+		animation: dice 1.2s 0.5s ease-in-out;
 		animation-fill-mode: both;
 	}
 	@keyframes dice {

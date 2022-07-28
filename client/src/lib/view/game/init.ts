@@ -4,22 +4,19 @@ import { GameScene } from "./scene";
 var ratio = window.devicePixelRatio || 1;
 export function resize() {
     if(!game || !htmlcanvas) return;
-    try {
-        game.scale.resize(htmlcanvas.parentElement!.clientWidth * ratio, htmlcanvas.parentElement!.clientHeight * ratio);
-    } catch(e) {
-        // @ts-ignore
-        console.error(e, new ErrorEvent(e.type, { colno: e.colno, error: e, lineno: e.lineno, message: e.message, filename: e.filename }));
-        window.dispatchEvent(new ErrorEvent("error", e as any));
-    }
+    // try {
+    //     game.scale.resize(htmlcanvas.parentElement!.clientWidth * ratio, htmlcanvas.parentElement!.clientHeight * ratio);
+    // } catch(e) {
+    //     // @ts-ignore
+    //     console.error(e, new ErrorEvent(e.type, { colno: e.colno, error: e, lineno: e.lineno, message: e.message, filename: e.filename }));
+    //     window.dispatchEvent(new ErrorEvent("error", e as any));
+    // }
     // console.log("size", htmlcanvas.parentElement!.clientWidth * ratio, htmlcanvas.parentElement!.clientHeight * ratio);
 }
 
-/** @type {HTMLCanvasElement} */
 var htmlcanvas: HTMLCanvasElement;
-/** @type {Game} */
 var game: Game;
-/** @type {GameScene} */
-var gs: GameScene;
+var gs: GameScene | null = null;
 export function setCanvas(canvas: HTMLCanvasElement) {
     htmlcanvas = canvas;
     var ctx = canvas.getContext("webgl2") || canvas.getContext("webgl");
@@ -43,7 +40,12 @@ export function setCanvas(canvas: HTMLCanvasElement) {
         title: "Multidie",
         version: "0",
         scene: [gs],
-        backgroundColor: "#01021B",
+        backgroundColor: "#85e65c",
         banner: false
     });
+}
+
+export function stop() {
+    game.destroy(false);
+    gs = null;
 }

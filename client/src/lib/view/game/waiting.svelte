@@ -3,7 +3,7 @@
 	import Button from '../components/button.svelte';
 
 	function startGame() {
-        
+        $connection!.startGame();
     }
     let content = "";
     function sendMessage() {
