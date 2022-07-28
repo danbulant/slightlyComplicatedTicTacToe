@@ -11,6 +11,21 @@ class FastEvent extends Event {
 const hosts: { urls: string, credential?: string, username?: string }[] = [
     {
         urls: "stun:openrelay.metered.ca:80",
+    },
+    {
+      urls: "turn:openrelay.metered.ca:80",
+      username: "openrelayproject",
+      credential: "openrelayproject",
+    },
+    {
+      urls: "turn:openrelay.metered.ca:443",
+      username: "openrelayproject",
+      credential: "openrelayproject",
+    },
+    {
+      urls: "turn:openrelay.metered.ca:443?transport=tcp",
+      username: "openrelayproject",
+      credential: "openrelayproject",
     }
 ]
 
@@ -140,7 +155,8 @@ export class WebsocketConnection extends EventTarget {
     }
 
     connect() {
-        this.ws = new WebSocket("ws://" + location.hostname + ":8080/?name=" + encodeURIComponent(this.name));
+        const host = location.hostname.includes("danbulant.eu") ? "multidie.danbulant.cloud" : location.hostname + ":8080";
+        this.ws = new WebSocket("ws://" + host + "/?name=" + encodeURIComponent(this.name));
         this.ws.addEventListener("open", (e) => {
             console.log("WS ready");
             this.refreshList();
