@@ -60,7 +60,7 @@
                 <input type="text" placeholder="Chat.." bind:value={content} on:submit|preventDefault={sendMessage}>
             </form>
             <Button on:click={() => sendMessage()}>Send</Button>
-			{#if $room?.host === $connection?.name}
+			{#if $room?.host === $connection?.name && $players.size > 0}
                 <Button on:click={() => startGame()}>START GAME</Button>
             {:else}
                 <Button disabled>WAIT TO START</Button>
