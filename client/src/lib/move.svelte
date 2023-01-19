@@ -24,7 +24,7 @@
         <line x1="0" y1="66%" x2="100%" y2="66%" stroke="currentColor" stroke-width="2" />
 
         {#if board !== "?"}
-            <rect x="{[0,33,66][Math.floor(board / 3)]}%" y="{[0,33,66][(board % 3)]}%" width="33%" height="33%" fill="currentColor" stroke="none" />
+            <rect y="{[0,33,66][Math.floor(board / 3)]}%" x="{[0,33,66][(board % 3)]}%" width="33%" height="33%" fill="currentColor" stroke="none" />
         {/if}
     </svg></span>
     <span class="piece flex items-center">#{piece == "?" ? "?" : piece + 1}<svg width="16" height="16">
@@ -34,7 +34,7 @@
         <line x1="0" y1="66%" x2="100%" y2="66%" stroke="currentColor" stroke-width="2" />
 
         {#if piece !== "?"}
-            <rect x="{[0,33,66][Math.floor(piece / 3)]}%" y="{[0,33,66][(piece % 3)]}%" width="33%" height="33%" fill="currentColor" stroke="none" />
+            <rect y="{[0,33,66][Math.floor(piece / 3)]}%" x="{[0,33,66][(piece % 3)]}%" width="33%" height="33%" fill="currentColor" stroke="none" />
         {/if}
     </svg></span>
 </div>

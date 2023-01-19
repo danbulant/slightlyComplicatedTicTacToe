@@ -1,5 +1,13 @@
 <script lang="ts">
+	import { createEventDispatcher } from "svelte";
 	import Move from "./move.svelte";
+
+    export var self: 1 | 2 = 1;
+    export var twoPlayer: boolean = false;
+    export var selfName: string | null = null;
+    export var opponentName: string | null = null;
+
+    const dispatch = createEventDispatcher();
 
     var classes = [
         'top left',
@@ -55,8 +63,11 @@
         if(moves.find(move => move.i == i && move.j == j))
             return;
         if(currentContainer !== i) return;
+        if(twoPlayer && currentPlayer !== self) return;
         moves.push({ p: currentPlayer, i, j });
         moves = moves;
+
+        dispatch("move", { i, j, p: currentPlayer });
 
         updateContainerStates();
     }
@@ -151,12 +162,12 @@
 </div>
 
 <main class:disabled={overallState} class="flex flex-wrap min-h-100vh min-w-full items-center">
-    <div class="board relative">
+    <div class="board relative p-8">
         {#each classes as className, i}
             <div class:hover={hoveredPiece?.i == i} class:disabled={containerStates[i]} class:current={currentContainer === i} class:highlighted={highlightedContainer === i} class="squares-container {className}">
                 {#each (new Array(9)) as _, j}
                     {@const move = moves.find(move => move.i == i && move.j == j)}
-                    <div on:click={() => addMove(i, j)} class:hover={hoveredPiece?.i == i && hoveredPiece.j == j} class="square" class:move class:preview={!move} class:cross={move && move.p==1} class:circle={move && move.p==2} on:mouseover={() => hoveredPiece = { i, j }} on:mouseleave={() => { if(hoveredPiece?.i == i && hoveredPiece.j == j) hoveredPiece = null; }}>
+                    <div on:click={() => addMove(i, j)} class:hover={hoveredPiece?.i == i && hoveredPiece.j == j} class="square" class:move class:preview={!move} class:cross={move && move.p==1} class:circle={move && move.p==2} on:mouseover={() => { if(currentContainer == i) hoveredPiece = { i, j } }} on:mouseleave={() => { if(hoveredPiece?.i == i && hoveredPiece.j == j) hoveredPiece = null; }}>
                         {#if move}
                             {#if move.p == 1}
                                 <svg width="16" height="16">
@@ -230,9 +241,28 @@
                 </svg>
             </div>
         {/if}
+
+        <div class="absolute top-200 left-0 right-0 text-center">
+            {#if currentPlayer == 1}
+                <svg width="16" height="16" class="text-red-500">
+                    <line x1="0" y1="0" x2="100%" y2="100%" stroke="currentColor" stroke-width="2" />
+                    <line x1="100%" y1="0" x2="0" y2="100%" stroke="currentColor" stroke-width="2" />
+                </svg>
+            {:else}
+                <svg width="16" height="16" class="text-blue-500">
+                    <circle cx="50%" cy="50%" r="45%" stroke="currentColor" stroke-width="2" fill="none" />
+                </svg>
+            {/if}
+            is on turn.
+            {#if twoPlayer && self == currentPlayer}
+                <b>It is <span class:text-red-500={currentPlayer == 1} class:text-blue-500={currentPlayer == 2}>YOUR</span> {selfName ? "(" + selfName + ")" : ""} turn.</b>
+            {:else if twoPlayer && self != currentPlayer}
+                Waiting for {opponentName || "opponent"}...
+            {/if}
+        </div>
     </div>
 
-    <div class="info min-w-60 px-4 min-h-full">
+    <div class="info min-w-38 px-4 h-full overflow-y-auto <md:w-full">
         <div class="moves">
             {#each moves as move}
                 <Move player={move.p} board={move.i} piece={move.j} on:mouseover={() => hoveredPiece = { i: move.i, j: move.j }} on:mouseout={() => { if(hoveredPiece?.j == move.j && hoveredPiece.i == move.i) hoveredPiece = null }} />
@@ -245,6 +275,9 @@
 
 
 <style>
+    .info .moves {
+        columns: 9.5rem auto;
+    }
     .winner {
         @apply absolute inset-4 pointer-events-none;
     }
@@ -264,7 +297,7 @@
         @apply grid grid-cols-3 grid-rows-3 gap-10 w-max h-max m-auto my-5;
     }
     .squares-container {
-        @apply grid grid-cols-3 grid-rows-3 gap-5 w-max h-max bg-black/5 opacity-35 relative;
+        @apply grid grid-cols-3 grid-rows-3 gap-5 w-max h-max opacity-35 relative;
     }
 
     .square {
@@ -291,10 +324,10 @@
     .square:hover, .square.hover {
         @apply bg-black/5;
     }
-    .square.hover.cross {
+    .square.hover.cross, .square:hover.cross {
         @apply text-red-500;
     }
-    .square.hover.circle {
+    .square.hover.circle, .square:hover.circle {
         @apply text-blue-500;
     }
     .highlighted {

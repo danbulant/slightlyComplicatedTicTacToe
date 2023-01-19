@@ -1,0 +1,5 @@
+
+<svg width="16" height="16">
+    <line x1="0" y1="0" x2="100%" y2="100%" stroke="rgb(239,68,68)" stroke-width="2" />
+    <line x1="100%" y1="0" x2="0" y2="100%" stroke="rgb(239,68,68)" stroke-width="2" />
+</svg>
