@@ -153,10 +153,10 @@
 <main class:disabled={overallState} class="flex flex-wrap min-h-100vh min-w-full items-center">
     <div class="board relative">
         {#each classes as className, i}
-            <div class:disabled={containerStates[i]} class:current={currentContainer === i} class:highlighted={highlightedContainer === i} class="squares-container {className}">
+            <div class:hover={hoveredPiece?.i == i} class:disabled={containerStates[i]} class:current={currentContainer === i} class:highlighted={highlightedContainer === i} class="squares-container {className}">
                 {#each (new Array(9)) as _, j}
                     {@const move = moves.find(move => move.i == i && move.j == j)}
-                    <div on:click={() => addMove(i, j)} class="square" class:move class:preview={!move} class:cross={move && move.p==1} class:circle={move && move.p==2} on:mouseover={() => hoveredPiece = { i, j }} on:mouseleave={() => { if(hoveredPiece?.i == i && hoveredPiece.j == j) hoveredPiece = null; }}>
+                    <div on:click={() => addMove(i, j)} class:hover={hoveredPiece?.i == i && hoveredPiece.j == j} class="square" class:move class:preview={!move} class:cross={move && move.p==1} class:circle={move && move.p==2} on:mouseover={() => hoveredPiece = { i, j }} on:mouseleave={() => { if(hoveredPiece?.i == i && hoveredPiece.j == j) hoveredPiece = null; }}>
                         {#if move}
                             {#if move.p == 1}
                                 <svg width="16" height="16">
@@ -235,7 +235,7 @@
     <div class="info min-w-60 px-4 min-h-full">
         <div class="moves">
             {#each moves as move}
-                <Move player={move.p} board={move.i} piece={move.j} />
+                <Move player={move.p} board={move.i} piece={move.j} on:mouseover={() => hoveredPiece = { i: move.i, j: move.j }} on:mouseout={() => { if(hoveredPiece?.j == move.j && hoveredPiece.i == move.i) hoveredPiece = null }} />
             {/each}
             <Move latest player={currentPlayer} board={hoveredPiece?.i ?? "?"} piece={hoveredPiece?.j ?? "?"} />
         </div>
@@ -270,6 +270,12 @@
     .square {
         @apply border-black border-solid border w-6 h-6 p-4 cursor-pointer flex items-center justify-center;
     }
+    .squares-container:not(.current) .square:active {
+        @apply bg-red-600/10;
+    }
+    .squares-container.hover {
+        @apply opacity-100;
+    }
     .square.preview svg {
         @apply hidden opacity-20;
     }
@@ -282,8 +288,14 @@
     .square svg {
         @apply w-full h-full;
     }
-    .square:hover {
+    .square:hover, .square.hover {
         @apply bg-black/5;
+    }
+    .square.hover.cross {
+        @apply text-red-500;
+    }
+    .square.hover.circle {
+        @apply text-blue-500;
     }
     .highlighted {
         @apply opacity-75;
