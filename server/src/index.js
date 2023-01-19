@@ -217,8 +217,7 @@ require("uWebSockets.js")
                         );
                         break;
                     }
-                    case "cand":
-                    case "desc": {
+                    case "broadcast": {
                         if (!client) return ws.end(0, "missing_client");
                         const room = client.room;
                         if (!room)
@@ -228,41 +227,28 @@ require("uWebSockets.js")
                                     e: "room_not_found",
                                 })
                             );
+
                         if (!room.clients.includes(client))
                             return ws.send(
                                 JSON.stringify({ t: "error", e: "not_in_room" })
                             );
-                        const targetClient = room.clients.find(
-                            (t) => t.name === data.target
-                        );
-                        if (!targetClient)
-                            return ws.send(
+
+                        room.clients.forEach((client) => {
+                            client.connection.send(
                                 JSON.stringify({
-                                    t: "error",
-                                    e: "target_not_found",
+                                    t: "broadcast",
+                                    client: client.name,
+                                    data: data.d,
                                 })
                             );
-                        if (!room.clients.includes(targetClient))
-                            return ws.send(
-                                JSON.stringify({
-                                    t: "error",
-                                    e: "target_not_in_room",
-                                })
-                            );
-                        targetClient.connection.send(
-                            JSON.stringify({
-                                t: data.t,
-                                source: client.name,
-                                d: data.d,
-                            })
-                        );
+                        });
                     }
                     case "list": {
                         ws.send(
                             JSON.stringify({
                                 t: "list",
                                 rooms: [...rooms.values()]
-                                    .filter((t) => t.clients.length < 5)
+                                    .filter((t) => t.clients.length < 2)
                                     .map((t) => ({
                                         name: t.name,
                                         host: t.host.name,
