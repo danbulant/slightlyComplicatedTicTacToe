@@ -1,7 +1,7 @@
 <script lang="ts">
     export var player: number;
-    export var board: number | string;
-    export var piece: number | string;
+    export var board: number | "?";
+    export var piece: number | "?";
     export var latest: boolean = false;
 </script>
 <div class="move" class:latest>
@@ -17,8 +17,26 @@
             </svg>
         {/if}
     </span>
-    <span class="board">B<b>{board}</b></span>
-    <span class="piece">#<b>{piece}</b></span>
+    <span class="board flex items-center">B{board}<svg width="16" height="16">
+        <line x1="33%" y1="0" x2="33%" y2="100%" stroke="currentColor" stroke-width="2" />
+        <line x1="66%" y1="0" x2="66%" y2="100%" stroke="currentColor" stroke-width="2" />
+        <line x1="0" y1="33%" x2="100%" y2="33%" stroke="currentColor" stroke-width="2" />
+        <line x1="0" y1="66%" x2="100%" y2="66%" stroke="currentColor" stroke-width="2" />
+
+        {#if board !== "?"}
+            <rect x="{[0,33,66][Math.floor(board / 3)]}%" y="{[0,33,66][(board % 3)]}%" width="33%" height="33%" fill="currentColor" stroke="none" />
+        {/if}
+    </svg></span>
+    <span class="piece flex items-center">#{piece}<svg width="16" height="16">
+        <line x1="33%" y1="0" x2="33%" y2="100%" stroke="currentColor" stroke-width="2" />
+        <line x1="66%" y1="0" x2="66%" y2="100%" stroke="currentColor" stroke-width="2" />
+        <line x1="0" y1="33%" x2="100%" y2="33%" stroke="currentColor" stroke-width="2" />
+        <line x1="0" y1="66%" x2="100%" y2="66%" stroke="currentColor" stroke-width="2" />
+
+        {#if piece !== "?"}
+            <rect x="{[0,33,66][Math.floor(piece / 3)]}%" y="{[0,33,66][(piece % 3)]}%" width="33%" height="33%" fill="currentColor" stroke="none" />
+        {/if}
+    </svg></span>
 </div>
 
 <style>
@@ -30,7 +48,9 @@
     }
     .player {
         @apply inline-block w-1em h-1em;
-        margin-top: -0.225em;
+    }
+    svg {
+        margin-top: -0.175em;
     }
     .player svg {
         @apply w-full h-full;
