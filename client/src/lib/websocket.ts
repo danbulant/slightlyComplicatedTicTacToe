@@ -179,6 +179,12 @@ export class WebsocketConnection extends EventTarget {
     }
 
     leave() {
+        connection.set(null);
+        room.set(null);
+        messages.set([]);
+        gameData.set(null);
+        listLoading.set(false);
+        list.set(null);
         this.ws.close();
     }
 }

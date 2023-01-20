@@ -1,12 +1,12 @@
 <script>
 	import { quadOut } from "svelte/easing";
 	import { fly } from "svelte/transition";
-	import { room } from "./websocket";
+	import { connection, room } from "./websocket";
 
     const duration = 400;
 </script>
 
-<a href="/multiplayer" class="arrow-back fixed top-0 left-0 w-4 h-4 m-4 p-2 transform transition-transform hover:-translate-x-1">
+<a on:click={() => { $connection?.leave() }} href="/multiplayer" class="arrow-back fixed top-0 left-0 w-4 h-4 m-4 p-2 transform transition-transform hover:-translate-x-1">
     <svg width="16" height="16">
         <line y1="50%" x1="0" y2="50%" x2="100%" stroke="currentColor" stroke-width="2" />
         <line y1="50%" x1="0" y2="100%" x2="50%" stroke="currentColor" stroke-width="2" />
