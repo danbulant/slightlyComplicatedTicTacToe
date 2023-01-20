@@ -1,5 +1,11 @@
 import { writable, type Writable } from "svelte/store";
 
+export class MoveEvent extends Event {
+    constructor(public i: number, public j: number) {
+        super("move");
+    }
+}
+
 export class WebsocketConnection extends EventTarget {
     ws: WebSocket;
     roomName: string | null = null;
@@ -30,7 +36,7 @@ export class WebsocketConnection extends EventTarget {
             list.set(null);
         });
         this.ws.addEventListener("error", (e) => {
-            console.error("WS error");
+            console.error("WS error", e);
             this.addError("Connection error");
             connection.set(null);
             room.set(null);
@@ -43,6 +49,7 @@ export class WebsocketConnection extends EventTarget {
                 case "join": {
                     messages.update(t => { t.push({ type: "system", content: `${msg.client} joined`});return t})
                     this.players.add(msg.client);
+                    room.update(t => { t!.count = this.players.size; return t });
                     break;
                 }
                 case "joined": {
@@ -55,7 +62,8 @@ export class WebsocketConnection extends EventTarget {
                     this.roomHost = msg.host;
                     room.set({
                         name: msg.name,
-                        host: msg.host
+                        host: msg.host,
+                        count: clients.length
                     });
                     break;
                 }
@@ -64,7 +72,8 @@ export class WebsocketConnection extends EventTarget {
                     this.roomHost = this.name;
                     room.set({
                         name: msg.name,
-                        host: this.name
+                        host: this.name,
+                        count: 1
                     });
                     this.addMessage({ type: "system", content: `${msg.name} created the room`});
                     break;
@@ -75,6 +84,7 @@ export class WebsocketConnection extends EventTarget {
                         gameData.set(null);
                     }
                     this.players.delete(msg.client);
+                    room.update(t => { t!.count = this.players.size; return t });
                     break;
                 }
                 case "host": {
@@ -94,6 +104,30 @@ export class WebsocketConnection extends EventTarget {
                 case "list": {
                     list.set(msg.rooms);
                     listLoading.set(false);
+                    break;
+                }
+                case "room_created": {
+                    list.update(t => { t?.push({ name: msg.name}); return t });
+                    break;
+                }
+                case "room_deleted": {
+                    list.update(t => {
+                        if(!t) return t;
+                        var i = t.findIndex(t => t.name == msg.name);
+                        if(i == -1) return t;
+                        t.splice(i, 1);
+                        return t;
+                    });
+                    break;
+                }
+                case "broadcast": {
+                    if(msg.client == this.name) break;
+                    switch (msg.d.t) {
+                        case "move": {
+                            console.log("Dispatching move event", msg.d.i, msg.d.j)
+                            this.dispatchEvent(new MoveEvent(msg.d.i, msg.d.j));
+                        }
+                    }
                     break;
                 }
                 case "error": {
@@ -143,6 +177,10 @@ export class WebsocketConnection extends EventTarget {
     send(data: any) {
         this.ws.send(data);
     }
+
+    leave() {
+        this.ws.close();
+    }
 }
 
 interface ErrorMessage {
@@ -162,6 +200,6 @@ interface SystemMessage {
 export const connection: Writable<WebsocketConnection | null> = writable(null);
 export const list: Writable<{ name: string }[] | null> = writable(null);
 export const listLoading = writable(true);
-export const room: Writable<{ name: string, host: string } | null> = writable(null);
+export const room: Writable<{ name: string, host: string, count: number } | null> = writable(null);
 export const messages: Writable<(UserMessage | ErrorMessage | SystemMessage)[]> = writable([]);
 export const gameData: Writable<{ log: { p: string, i: number, j: number }[] }|null> = writable(null);

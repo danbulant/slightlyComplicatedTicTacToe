@@ -23,6 +23,18 @@ const rooms = new Map();
  */
 const clients = new Map();
 
+function deleteRoom(room) {
+    rooms.delete(room);
+
+    for(let [, client] of clients) {
+        if(!client.room) {
+            client.connection.send(
+                JSON.stringify({ t: "room_deleted", name: room })
+            )
+        }
+    }
+}
+
 require("uWebSockets.js")
     .App({})
     .ws("/", {
@@ -39,11 +51,15 @@ require("uWebSockets.js")
                 name.length < 2 ||
                 name.length > 64 ||
                 !name.trim()
-            )
+            ) {
+                console.log("Invalid name");
                 return res.end("invalid_name");
+            }
             name = name.trim();
-            if ([...clients.values()].find((client) => client.name === name))
+            if ([...clients.values()].find((client) => client.name === name)) {
+                console.log("Duplicate name");
                 return res.end("name_used");
+            }
             /* This immediately calls open handler, you must not use res after this call */
             res.upgrade(
                 {
@@ -120,8 +136,15 @@ require("uWebSockets.js")
                         };
                         rooms.set(room.name, room);
                         client.room = room;
+                        for(let [, cclient] of clients) {
+                            if(!cclient.room) {
+                                cclient.connection.send(
+                                    JSON.stringify({ t: "room_created", name })
+                                );
+                            }
+                        }
                         return ws.send(
-                            JSON.stringify({ t: "create", name: name })
+                            JSON.stringify({ t: "create", name })
                         );
                     }
                     case "leave": {
@@ -139,7 +162,7 @@ require("uWebSockets.js")
                             );
                         room.clients.splice(room.clients.indexOf(client), 1);
                         if (room.clients.length === 0) {
-                            rooms.delete(room.name);
+                            deleteRoom(room.name);
                         } else if (room.host == ws) {
                             room.host = room.clients[0];
                             room.clients.forEach((client) =>
@@ -233,12 +256,13 @@ require("uWebSockets.js")
                                 JSON.stringify({ t: "error", e: "not_in_room" })
                             );
 
+                        let clientName = client.name
                         room.clients.forEach((client) => {
                             client.connection.send(
                                 JSON.stringify({
                                     t: "broadcast",
-                                    client: client.name,
-                                    data: data.d,
+                                    client: clientName,
+                                    d: data.d,
                                 })
                             );
                         });
@@ -274,7 +298,7 @@ require("uWebSockets.js")
                     if (room) {
                         room.clients.splice(room.clients.indexOf(client), 1);
                         if (room.clients.length === 0) {
-                            rooms.delete(room.name);
+                            deleteRoom(room.name);
                         } else if (room.host == ws) {
                             room.host = room.clients[0];
                             room.clients.forEach((client) =>

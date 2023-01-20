@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { createEventDispatcher } from "svelte";
+	import { quadOut } from "svelte/easing";
+	import { fly } from "svelte/transition";
 	import Move from "./move.svelte";
 
     export var self: 1 | 2 = 1;
@@ -72,6 +74,24 @@
         updateContainerStates();
     }
 
+    function addPlayerMove(player: 1 | 2, i: number, j: number) {
+        if(moves.find(move => move.i == i && move.j == j)) {
+            console.error("DESYNC! Repeated move", player, i, j);
+            return;
+        }
+        if(currentContainer !== i) {
+            console.error("DESYNC! Invalid move (container not active)!", player, i, j, "current container:", i);
+            return;
+        }
+
+        moves.push({ p: player, i, j });
+        moves = moves;
+
+        updateContainerStates();
+    }
+
+    export { addPlayerMove };
+
     function updateContainerStates() {
         for(var i in containerStates) {
             if(containerStates[i]) continue;
@@ -138,9 +158,15 @@
         moves = [];
         containerStates = new Array(9).fill(0);
     }
+
+    function check(e: MouseEvent) {
+        if(twoPlayer) return;
+        var confirmed = confirm("Are you sure you want to quit?");
+        if(!confirmed) return e.preventDefault() || false;
+    }
 </script>
 
-<a href="/" class="arrow-back fixed top-0 left-0 w-4 h-4 m-4 p-2 transform transition-transform hover:-translate-x-1">
+<a href="/" on:click={check} class="arrow-back fixed top-0 left-0 w-4 h-4 m-4 p-2 transform transition-transform hover:-translate-x-1">
     <svg width="16" height="16">
         <line y1="50%" x1="0" y2="50%" x2="100%" stroke="currentColor" stroke-width="2" />
         <line y1="50%" x1="0" y2="100%" x2="50%" stroke="currentColor" stroke-width="2" />
@@ -148,18 +174,20 @@
     </svg>
 </a>
 
-<div on:click={reset} class="reload fixed top-0 left-10 w-4 h-4 m-4 p-2 transform transition-transform rotate-180 hover:rotate-360 active:rotate-540">
-    <svg fill="currentColor" height="800px" width="800px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
-	 viewBox="0 0 489.645 489.645" xml:space="preserve" class="w-full h-full">
-        <g>
-            <path d="M460.656,132.911c-58.7-122.1-212.2-166.5-331.8-104.1c-9.4,5.2-13.5,16.6-8.3,27c5.2,9.4,16.6,13.5,27,8.3
-                c99.9-52,227.4-14.9,276.7,86.3c65.4,134.3-19,236.7-87.4,274.6c-93.1,51.7-211.2,17.4-267.6-70.7l69.3,14.5
-                c10.4,2.1,21.8-4.2,23.9-15.6c2.1-10.4-4.2-21.8-15.6-23.9l-122.8-25c-20.6-2-25,16.6-23.9,22.9l15.6,123.8
-                c1,10.4,9.4,17.7,19.8,17.7c12.8,0,20.8-12.5,19.8-23.9l-6-50.5c57.4,70.8,170.3,131.2,307.4,68.2
-                C414.856,432.511,548.256,314.811,460.656,132.911z"/>
-        </g>
-    </svg>
-</div>
+{#if !twoPlayer}
+    <div on:click={reset} class="reload fixed top-0 left-10 w-4 h-4 m-4 p-2 transform transition-transform rotate-180 hover:rotate-360 active:rotate-540">
+        <svg fill="currentColor" height="800px" width="800px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+        viewBox="0 0 489.645 489.645" xml:space="preserve" class="w-full h-full">
+            <g>
+                <path d="M460.656,132.911c-58.7-122.1-212.2-166.5-331.8-104.1c-9.4,5.2-13.5,16.6-8.3,27c5.2,9.4,16.6,13.5,27,8.3
+                    c99.9-52,227.4-14.9,276.7,86.3c65.4,134.3-19,236.7-87.4,274.6c-93.1,51.7-211.2,17.4-267.6-70.7l69.3,14.5
+                    c10.4,2.1,21.8-4.2,23.9-15.6c2.1-10.4-4.2-21.8-15.6-23.9l-122.8-25c-20.6-2-25,16.6-23.9,22.9l15.6,123.8
+                    c1,10.4,9.4,17.7,19.8,17.7c12.8,0,20.8-12.5,19.8-23.9l-6-50.5c57.4,70.8,170.3,131.2,307.4,68.2
+                    C414.856,432.511,548.256,314.811,460.656,132.911z"/>
+            </g>
+        </svg>
+    </div>
+{/if}
 
 <main class:disabled={overallState} class="flex flex-wrap min-h-100vh min-w-full items-center">
     <div class="board relative p-8">
@@ -242,28 +270,45 @@
             </div>
         {/if}
 
-        <div class="absolute top-200 left-0 right-0 text-center">
-            {#if currentPlayer == 1}
-                <svg width="16" height="16" class="text-red-500">
-                    <line x1="0" y1="0" x2="100%" y2="100%" stroke="currentColor" stroke-width="2" />
-                    <line x1="100%" y1="0" x2="0" y2="100%" stroke="currentColor" stroke-width="2" />
-                </svg>
-            {:else}
-                <svg width="16" height="16" class="text-blue-500">
-                    <circle cx="50%" cy="50%" r="45%" stroke="currentColor" stroke-width="2" fill="none" />
-                </svg>
-            {/if}
-            is on turn.
-            {#if twoPlayer && self == currentPlayer}
-                <b>It is <span class:text-red-500={currentPlayer == 1} class:text-blue-500={currentPlayer == 2}>YOUR</span> {selfName ? "(" + selfName + ")" : ""} turn.</b>
-            {:else if twoPlayer && self != currentPlayer}
-                Waiting for {opponentName || "opponent"}...
-            {/if}
-        </div>
+        {#key currentPlayer}
+            <div class="absolute top-200 left-0 right-0 text-center" in:fly={{ delay: 300, duration: 300, easing: quadOut, opacity: 0, y: 30 }} out:fly={{ delay: 0, duration: 300, easing: quadOut, opacity: 0, y: -30 }}>
+                {#if currentPlayer == 1}
+                    <svg width="16" height="16" class="text-red-500">
+                        <line x1="0" y1="0" x2="100%" y2="100%" stroke="currentColor" stroke-width="2" />
+                        <line x1="100%" y1="0" x2="0" y2="100%" stroke="currentColor" stroke-width="2" />
+                    </svg>
+                {:else}
+                    <svg width="16" height="16" class="text-blue-500">
+                        <circle cx="50%" cy="50%" r="45%" stroke="currentColor" stroke-width="2" fill="none" />
+                    </svg>
+                {/if}
+                is on turn.
+                {#if twoPlayer && self == currentPlayer}
+                    <b>It is <span class:text-red-500={currentPlayer == 1} class:text-blue-500={currentPlayer == 2}>YOUR</span> {selfName ? "(" + selfName + ")" : ""} turn.</b>
+                {:else if twoPlayer && self != currentPlayer}
+                    Waiting for <b class:text-red-500={currentPlayer == 1} class:text-blue-500={currentPlayer == 2}>{opponentName || "opponent"}</b>...
+                {/if}
+            </div>
+        {/key}
     </div>
 
     <div class="info min-w-38 px-4 h-full overflow-y-auto <md:w-full">
         <div class="moves">
+            {#if twoPlayer}
+                <div class="move text-red-500">
+                    <svg width="16" height="16">
+                        <line x1="0" y1="0" x2="100%" y2="100%" stroke="currentColor" stroke-width="2" />
+                        <line x1="100%" y1="0" x2="0" y2="100%" stroke="currentColor" stroke-width="2" />
+                    </svg>
+                    {self == 1 ? (selfName || "you") : (opponentName || "opponent")}
+                </div>
+                <div class="move text-blue-500">
+                    <svg width="16" height="16">
+                        <circle cx="50%" cy="50%" r="45%" stroke="currentColor" stroke-width="2" fill="none" />
+                    </svg>
+                    {self == 2 ? (selfName || "you") : (opponentName || "opponent")}
+                </div>
+            {/if}
             {#each moves as move}
                 <Move player={move.p} board={move.i} piece={move.j} on:mouseover={() => hoveredPiece = { i: move.i, j: move.j }} on:mouseout={() => { if(hoveredPiece?.j == move.j && hoveredPiece.i == move.i) hoveredPiece = null }} />
             {/each}
@@ -277,6 +322,9 @@
 <style>
     .info .moves {
         columns: 9.5rem auto;
+    }
+    .move {
+        @apply p-1 flex gap-2 p-1 items-center leading-none;
     }
     .winner {
         @apply absolute inset-4 pointer-events-none;

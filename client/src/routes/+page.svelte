@@ -1,3 +1,6 @@
+<svelte:head>
+    <title>Slightly complicated tictactoe</title>
+</svelte:head>
 
 <main class="flex items-center justify-center flex-col">
     <div class="chooser">
@@ -50,8 +53,17 @@
     .chooser > a {
         @apply text-black no-underline cursor-pointer w-full p-8 border rounded-lg border-gray-400 border-solid;
     }
+    .chooser > a:hover {
+        @apply bg-black/10;
+    }
     .rules {
         @apply cursor-not-allowed text-gray-500 flex justify-center items-center w-full my-8 p-4 border rounded-lg border-gray-400 border-solid;
+    }
+    .rules:hover {
+        @apply bg-red-500/3;
+    }
+    .rules:active {
+        @apply bg-red-500/10;
     }
     .icon {
         @apply h-20 w-20 mr-4;

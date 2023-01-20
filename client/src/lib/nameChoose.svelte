@@ -18,6 +18,14 @@
     }
 </script>
 
+<a href="/" class="arrow-back fixed top-0 left-0 w-4 h-4 m-4 p-2 transform transition-transform hover:-translate-x-1">
+    <svg width="16" height="16">
+        <line y1="50%" x1="0" y2="50%" x2="100%" stroke="currentColor" stroke-width="2" />
+        <line y1="50%" x1="0" y2="100%" x2="50%" stroke="currentColor" stroke-width="2" />
+        <line y1="50%" x1="0" y2="0" x2="50%" stroke="currentColor" stroke-width="2" />
+    </svg>
+</a>
+
 {#if shown}
 <main>
     <div class="top">
@@ -33,6 +41,9 @@
 {/if}
 
 <style>
+    a {
+        @apply text-black;
+    }
     * {
         @apply box-border;
     }
