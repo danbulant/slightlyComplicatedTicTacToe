@@ -22,7 +22,7 @@ export class WebsocketConnection extends EventTarget {
     }
 
     connect() {
-        const host = location.hostname.includes("danbulant.eu") ? "wss://multidie.danbulant.cloud" : "ws://" + location.hostname + ":8080";
+        const host = location.hostname.includes("danbulant.eu") ? "wss://tictactoe.danbulant.cloud" : "ws://" + location.hostname + ":8080";
         this.ws = new WebSocket(host + "/?name=" + encodeURIComponent(this.name));
         this.ws.addEventListener("open", (e) => {
             console.log("WS ready");
