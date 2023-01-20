@@ -151,7 +151,7 @@
         if(containerStates[2] == containerStates[4] && containerStates[4] == containerStates[6] && containerStates[2] != 0) {
             overallState = containerStates[2];
         }
-        if(!overallState && moves.length == 81) {
+        if(containerStates.every(state => state != 0)) {
             overallState = 3;
         }
     }
