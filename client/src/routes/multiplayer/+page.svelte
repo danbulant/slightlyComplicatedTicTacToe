@@ -1,8 +1,8 @@
 <script>
-    import Game from "$lib/view/game/game.svelte";
-    import List from "$lib/view/menu/list.svelte";
-    import NameChoose from "$lib/view/menu/nameChoose.svelte";
-    import { connection, room } from "$lib/Websocket";
+    import Game from "$lib/game.svelte";
+    import List from "$lib/list.svelte";
+    import NameChoose from "$lib/nameChoose.svelte";
+    import { connection, room } from "$lib/websocket";
 </script>
 
 {#if !$connection}

@@ -50,12 +50,6 @@
     .chooser > a {
         @apply text-black no-underline cursor-pointer w-full p-8 border rounded-lg border-gray-400 border-solid;
     }
-    .chooser > .multi {
-        @apply cursor-not-allowed text-gray-500;
-    }
-    .chooser > .multi img {
-        @apply opacity-50;
-    }
     .rules {
         @apply cursor-not-allowed text-gray-500 flex justify-center items-center w-full my-8 p-4 border rounded-lg border-gray-400 border-solid;
     }

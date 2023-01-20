@@ -160,7 +160,7 @@ interface SystemMessage {
 }
 
 export const connection: Writable<WebsocketConnection | null> = writable(null);
-export const list: Writable<{ name: string, count: number }[] | null> = writable(null);
+export const list: Writable<{ name: string }[] | null> = writable(null);
 export const listLoading = writable(true);
 export const room: Writable<{ name: string, host: string } | null> = writable(null);
 export const messages: Writable<(UserMessage | ErrorMessage | SystemMessage)[]> = writable([]);
