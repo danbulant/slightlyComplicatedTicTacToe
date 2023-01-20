@@ -30,13 +30,15 @@
 <main>
     <div class="top">
         <h1 in:fly={{ delay: 0, duration, opacity: 0, y: 100, easing: quadOut }}>What is your nickname</h1>
-        <p in:fly={{ delay: duration*0.5, duration, opacity: 0, y: 100, easing: quadOut }}>This name is publicly visible and needs to be unique among the connected players.</p>
+        <p in:fly={{ delay: duration*0.5, duration, opacity: 0, y: 100, easing: quadOut }}>This name is publicly visible and needs to be unique among the connected players. Minimum 2 characters.</p>
     </div>
     
     <form on:submit>
         <input on:submit bind:value={name} type="text" min={2} max={64} in:fly={{ delay: duration*1, duration, opacity: 0, y: 100, easing: quadOut }}>
         <button on:click={submit} on:keydown={submit} in:fly={{ delay: duration*1.5, duration, opacity: 0, y: 100, easing: quadOut }}>Continue</button>
     </form>
+
+    <p>In case of invalid username you will not be able to connect. It's kind of hard to check the exact reason.</p>
 </main>
 {/if}
 

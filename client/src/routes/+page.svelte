@@ -1,17 +1,32 @@
+<script>
+	import { onMount } from "svelte";
+	import { quadOut } from "svelte/easing";
+	import { fly } from "svelte/transition";
+
+    const duration = 400;
+
+    var shown = false;
+
+    onMount(() => {
+        shown = true;
+    });
+</script>
+
 <svelte:head>
     <title>Ultimate tictactoe</title>
 </svelte:head>
 
+{#if shown}
 <main class="flex items-center justify-center flex-col">
     <div class="chooser">
-        <a href="/localplay" class="single">
+        <a href="/localplay" class="single" in:fly={{ delay: 0, duration, opacity: 0, y: 100, easing: quadOut }}>
             <h1>Local multiplayer</h1>
 
             <img src="/computer.svg" alt="">
 
             <p>A game for two on a single device</p>
         </a>
-        <a href="/multiplayer" class="multi">
+        <a href="/multiplayer" class="multi" in:fly={{ delay: duration * 0.5, duration, opacity: 0, y: 100, easing: quadOut }}>
             <h1>Online multiplayer</h1>
 
             <img src="/network.svg" alt="">
@@ -19,7 +34,7 @@
             <p>Play with 2 devices, even across the ocean.</p>
         </a>
     </div>
-    <div class="rules">
+    <div class="rules" in:fly={{ delay: 0, duration, opacity: 0, y: 100, easing: quadOut }}>
         <div class="icon">
             <svg fill="currentColor" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
                 width="800px" height="800px" viewBox="0 0 973.1 973.1" xml:space="preserve"
@@ -42,6 +57,7 @@
         </div>
     </div>
 </main>
+{/if}
 
 <style>
     main {
