@@ -51,6 +51,7 @@
     $: currentPlayer = moves[moves.length - 1]?.p == 1 ? 2 : 1;
 
     function getCurrentContainer(_moves?: any) {
+        if(overallState) return -1;
         let last = moves[moves.length - 1]?.j;
         if(last == null || last == undefined) return 4;
         
@@ -66,6 +67,7 @@
             return;
         if(currentContainer !== i) return;
         if(twoPlayer && currentPlayer !== self) return;
+        if(overallState) return;
         moves.push({ p: currentPlayer, i, j });
         moves = moves;
 
@@ -272,27 +274,43 @@
 
         {#key currentPlayer}
             <div class="absolute top-200 left-0 right-0 text-center" in:fly={{ delay: 300, duration: 300, easing: quadOut, opacity: 0, y: 30 }} out:fly={{ delay: 0, duration: 300, easing: quadOut, opacity: 0, y: -30 }}>
-                {#if currentPlayer == 1}
+                {#if overallState == 1 || currentPlayer == 1}
                     <svg width="16" height="16" class="text-red-500">
                         <line x1="0" y1="0" x2="100%" y2="100%" stroke="currentColor" stroke-width="2" />
                         <line x1="100%" y1="0" x2="0" y2="100%" stroke="currentColor" stroke-width="2" />
                     </svg>
-                {:else}
+                {:else if overallState == 2 || currentPlayer == 2}
                     <svg width="16" height="16" class="text-blue-500">
                         <circle cx="50%" cy="50%" r="45%" stroke="currentColor" stroke-width="2" fill="none" />
                     </svg>
+                {:else}
+                    <svg width="16" height="16">
+                        <line x1="0" y1="0" x2="100%" y2="100%" stroke="currentColor" stroke-width="2" />
+                        <line x1="100%" y1="0" x2="0" y2="100%" stroke="currentColor" stroke-width="2" />
+                        <circle cx="50%" cy="50%" r="45%" stroke="currentColor" stroke-width="2" fill="none" />
+                    </svg>
                 {/if}
-                is on turn.
-                {#if twoPlayer && self == currentPlayer}
-                    <b>It is <span class:text-red-500={currentPlayer == 1} class:text-blue-500={currentPlayer == 2}>YOUR</span> {selfName ? "(" + selfName + ")" : ""} turn.</b>
-                {:else if twoPlayer && self != currentPlayer}
-                    Waiting for <b class:text-red-500={currentPlayer == 1} class:text-blue-500={currentPlayer == 2}>{opponentName || "opponent"}</b>...
+                {#if overallState}
+                    {#if overallState == 1}
+                        <b class="text-red-500">{(self == 1 ? selfName : opponentName) || "cross"}</b> won
+                    {:else if overallState == 2}
+                        <b class="text-blue-500">{(self == 2 ? selfName : opponentName) || "circle"}</b> won
+                    {:else if overallState == 3}
+                        draw
+                    {/if}
+                {:else}
+                    is on turn.
+                    {#if twoPlayer && self == currentPlayer}
+                        <b>It is <span class:text-red-500={currentPlayer == 1} class:text-blue-500={currentPlayer == 2}>YOUR</span> {selfName ? "(" + selfName + ")" : ""} turn.</b>
+                    {:else if twoPlayer && self != currentPlayer}
+                        Waiting for <b class:text-red-500={currentPlayer == 1} class:text-blue-500={currentPlayer == 2}>{opponentName || "opponent"}</b>...
+                    {/if}
                 {/if}
             </div>
         {/key}
     </div>
 
-    <div class="info min-w-38 px-4 h-full overflow-y-auto <md:w-full">
+    <div class="info min-w-38 px-4 h-100vh overflow-y-auto <md:w-full">
         <div class="moves">
             {#if twoPlayer}
                 <div class="move text-red-500">

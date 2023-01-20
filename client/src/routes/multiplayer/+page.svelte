@@ -53,8 +53,8 @@
     <Game
         twoPlayer
         self={$room.host === $connection.name ? 1 : 2}
-        opponentName={$connection.name}
-        selfName={[...$connection.players.values()].find(t => t !== $connection?.name)}
+        opponentName={[...$connection.players.values()].find(t => t !== $connection?.name)}
+        selfName={$connection.name}
         on:move={addSelfMove}
         bind:addPlayerMove
         />
