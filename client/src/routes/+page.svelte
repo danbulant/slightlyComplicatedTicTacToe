@@ -1,5 +1,5 @@
 <svelte:head>
-    <title>Slightly complicated tictactoe</title>
+    <title>Ultimate tictactoe</title>
 </svelte:head>
 
 <main class="flex items-center justify-center flex-col">

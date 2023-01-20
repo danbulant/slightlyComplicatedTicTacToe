@@ -4,7 +4,7 @@
 </script>
 
 <svelte:head>
-    <title>Slightly complicated tictactoe</title>
+    <title>Ultimate tictactoe</title>
 </svelte:head>
 
 <Game />
