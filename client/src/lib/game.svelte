@@ -378,7 +378,7 @@
     {#if movesShown || innerWidth >= 1024}
         <div transition:fade={{ duration }} class="lg:hidden bg-black/40 fixed inset-0 z-10" on:click={() => movesShown = false} on:keydown={() => movesShown = false} />
 
-        <div transition:fly={{ delay: duration * moveDelayMultiplier * 3, duration, x: 160, opacity: 0 }} class="info z-11 min-w-38 px-4 flex-grow-0 flex-shrink overflow-y-auto lt-lg:(absolute top-0 right-0 h-full bg-black)">
+        <div transition:fly={{ delay: duration * moveDelayMultiplier * 3, duration, x: 160, opacity: 0 }} class="info z-11 min-w-38 px-4 flex-grow-0 flex-shrink overflow-y-auto h-100vh lt-lg:(absolute top-0 right-0 bg-black)">
             <div class="moves">
                 <div class="move">
                     Moves
