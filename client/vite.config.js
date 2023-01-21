@@ -16,7 +16,8 @@ const config = {
             transformerDirectives(),
             transformerVariantGroup(),
         ],
-    }), sveltekit()]
+    }), sveltekit()],
+    clearScreen: false,
 };
 
 export default config;
