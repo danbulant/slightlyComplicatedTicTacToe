@@ -54,7 +54,7 @@
 </div>
 
 <main class="flex flex-col w-100vw h-100vh">
-    <div class="p-4 pl-16 flex justify-between border-b border-b-black border-b-solid">
+    <div class="p-4 pl-16 flex justify-between border-b border-b-black dark:border-b-white border-b-solid">
         <h1 in:fly={{ delay: 0, duration, opacity: 0, y: 100, easing: quadOut }}>Rooms</h1>
         <div class="right">
             <button in:fly={{ delay: duration * 0.5, duration, opacity: 0, y: 100, easing: quadOut }} disabled>Quick match</button>
@@ -100,13 +100,34 @@
         @apply cursor-pointer border-b border-b-solid border-b-gray-300 p-4;
     }
     button {
-        @apply w-64 h-10 px-2 border border-gray-300 bg-white mt-4 my-0;
+        @apply w-64 h-10 px-2 border border-gray-300 bg-white mt-4 my-0 cursor-pointer;
+    }
+    button:disabled {
+        @apply bg-gray-300 cursor-not-allowed;
+    }
+    :global(.dark) button {
+        @apply bg-white/15 border-gray-700 text-white;
+    }
+    :global(.dark) button:hover {
+        @apply bg-white/10;
+    }
+    :global(.dark) button:disabled {
+        @apply bg-black;
+    }
+    :global(.dark) button:disabled:hover {
+        @apply bg-gray-900;
     }
     dialog .header button {
         @apply w-12;
     }
+    :global(.dark) dialog {
+        @apply bg-black border-gray-700 text-white;
+    }
     input {
         @apply w-64 h-10 px-2 border border-gray-300 rounded-l-lg mt-4 my-0;
+    }
+    :global(.dark) input {
+        @apply border-gray-400 text-white bg-black;
     }
     button:first-child {
         @apply rounded-l-lg;

@@ -1,5 +1,7 @@
 <script>
-	import { onMount } from "svelte";
+	import DarkmodeIcon from "$lib/DarkmodeIcon.svelte";
+	import { themeStore } from "$lib/themeStore";
+    import { onMount } from "svelte";
 	import { quadOut } from "svelte/easing";
 	import { fly } from "svelte/transition";
 
@@ -10,6 +12,14 @@
     onMount(() => {
         shown = true;
     });
+
+    function toggleDarkmode() {
+        if($themeStore == "dark") {
+            $themeStore = "light";
+        } else {
+            $themeStore = "dark";
+        }
+    }
 </script>
 
 <svelte:head>
@@ -22,19 +32,19 @@
         <a href="/localplay" class="single" in:fly={{ delay: 0, duration, opacity: 0, y: 100, easing: quadOut }}>
             <h1>Local multiplayer</h1>
 
-            <img src="/computer.svg" alt="">
+            <div class="computer"></div>
 
             <p>A game for two on a single device</p>
         </a>
         <a href="/multiplayer" class="multi" in:fly={{ delay: duration * 0.5, duration, opacity: 0, y: 100, easing: quadOut }}>
             <h1>Online multiplayer</h1>
 
-            <img src="/network.svg" alt="">
+            <div class="multiplayer"></div>
     
             <p>Play with 2 devices, even across the ocean.</p>
         </a>
     </div>
-    <div class="rules" in:fly={{ delay: 0, duration, opacity: 0, y: 100, easing: quadOut }}>
+    <div class="rules" in:fly={{ delay: duration, duration, opacity: 0, y: 100, easing: quadOut }}>
         <div class="icon">
             <svg fill="currentColor" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
                 width="800px" height="800px" viewBox="0 0 973.1 973.1" xml:space="preserve"
@@ -56,10 +66,43 @@
             <p>How do I play the game?</p>
         </div>
     </div>
+    <div class="darkmode">
+        <button on:click={toggleDarkmode} in:fly={{ delay: duration * 1.5, duration, opacity: 0, y: 100, easing: quadOut }}>
+            <DarkmodeIcon />
+            Toggle dark mode
+        </button>
+    </div>
 </main>
 {/if}
 
 <style>
+    .computer {
+        @apply w-full bg-black;
+        aspect-ratio: 1/1;
+        mask: url('/computer.svg') no-repeat center;
+        -webkit-mask: url('/computer.svg') no-repeat center;
+    }
+    .multiplayer {
+        @apply w-full bg-black;
+        aspect-ratio: 1/1;
+        mask: url('/network.svg') no-repeat center;
+        -webkit-mask: url('/network.svg') no-repeat center;
+    }
+    :global(.dark) .computer, :global(.dark) .multiplayer {
+        @apply bg-white;
+    }
+    button {
+        @apply p-4 rounded-lg bg-transparent border-none cursor-pointer flex items-center justify-center gap-4;
+    }
+    button:hover {
+        @apply bg-black/10;
+    }
+    :global(.dark) button {
+        @apply text-white;
+    }
+    :global(.dark) button:hover {
+        @apply bg-white/10;
+    }
     main {
         @apply my-4 p-4 w-max m-auto h-100vh;
     }
@@ -69,8 +112,14 @@
     .chooser > a {
         @apply text-black no-underline cursor-pointer w-full p-8 border rounded-lg border-gray-400 border-solid;
     }
+    :global(.dark) .chooser > a {
+        @apply text-white;
+    }
     .chooser > a:hover {
         @apply bg-black/10;
+    }
+    :global(.dark) .chooser > a:hover {
+        @apply bg-white/10;
     }
     .rules {
         @apply cursor-not-allowed text-gray-500 flex justify-center items-center w-full my-8 p-4 border rounded-lg border-gray-400 border-solid;

@@ -168,7 +168,7 @@
     }
 </script>
 
-<a href="/" on:click={check} class="arrow-back fixed top-0 left-0 w-4 h-4 m-4 p-2 transform transition-transform hover:-translate-x-1">
+<a href="/" on:click={check} class="text-black dark:text-white arrow-back fixed top-0 left-0 w-4 h-4 m-4 p-2 transform transition-transform hover:-translate-x-1">
     <svg width="16" height="16">
         <line y1="50%" x1="0" y2="50%" x2="100%" stroke="currentColor" stroke-width="2" />
         <line y1="50%" x1="0" y2="100%" x2="50%" stroke="currentColor" stroke-width="2" />
@@ -177,7 +177,7 @@
 </a>
 
 {#if !twoPlayer}
-    <div on:click={reset} class="reload fixed top-0 left-10 w-4 h-4 m-4 p-2 transform transition-transform rotate-180 hover:rotate-360 active:rotate-540">
+    <div on:click={reset} on:keydown={reset} class="reload fixed top-0 left-10 w-4 h-4 m-4 p-2 transform transition-transform rotate-180 hover:rotate-360 active:rotate-540">
         <svg fill="currentColor" height="800px" width="800px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
         viewBox="0 0 489.645 489.645" xml:space="preserve" class="w-full h-full">
             <g>
@@ -196,8 +196,23 @@
         {#each classes as className, i}
             <div class:hover={hoveredPiece?.i == i} class:disabled={containerStates[i]} class:current={currentContainer === i} class:highlighted={highlightedContainer === i} class="squares-container {className}">
                 {#each (new Array(9)) as _, j}
-                    {@const move = moves.find(move => move.i == i && move.j == j)}
-                    <div on:click={() => addMove(i, j)} class:hover={hoveredPiece?.i == i && hoveredPiece.j == j} class="square" class:move class:preview={!move} class:cross={move && move.p==1} class:circle={move && move.p==2} on:mouseover={() => { if(currentContainer == i) hoveredPiece = { i, j } }} on:mouseleave={() => { if(hoveredPiece?.i == i && hoveredPiece.j == j) hoveredPiece = null; }}>
+                    {@const moveIndex = moves.findIndex(cmove => cmove.i == i && cmove.j == j)}
+                    {@const move = moves[moveIndex]}
+                    <div
+                        class:latest={moveIndex == moves.length - 1}
+                        on:click={() => addMove(i, j)}
+                        on:keydown={() => addMove(i, j)}
+                        class:hover={hoveredPiece?.i == i && hoveredPiece.j == j}
+                        class="square"
+                        class:move
+                        class:preview={!move}
+                        class:cross={move && move.p==1}
+                        class:circle={move && move.p==2}
+                        on:mouseover={() => { if(currentContainer == i) hoveredPiece = { i, j } }}
+                        on:focus={() => { if(currentContainer == i) hoveredPiece = { i, j }}}
+                        on:mouseleave={() => { if(hoveredPiece?.i == i && hoveredPiece.j == j) hoveredPiece = null; }}
+                        >
+
                         {#if move}
                             {#if move.p == 1}
                                 <svg width="16" height="16">
@@ -273,18 +288,18 @@
         {/if}
 
         {#key currentPlayer}
-            <div class="absolute top-200 left-0 right-0 text-center" in:fly={{ delay: 300, duration: 300, easing: quadOut, opacity: 0, y: 30 }} out:fly={{ delay: 0, duration: 300, easing: quadOut, opacity: 0, y: -30 }}>
-                {#if overallState == 1 || currentPlayer == 1}
-                    <svg width="16" height="16" class="text-red-500">
+            <div class="absolute top-200 left-0 right-0 text-center flex items-center justify-center gap-2" in:fly={{ delay: 300, duration: 300, easing: quadOut, opacity: 0, y: 30 }} out:fly={{ delay: 0, duration: 300, easing: quadOut, opacity: 0, y: -30 }}>
+                {#if overallState == 1 || !overallState && currentPlayer == 1}
+                    <svg width="16" height="16" class="mb-0.5 text-red-500">
                         <line x1="0" y1="0" x2="100%" y2="100%" stroke="currentColor" stroke-width="2" />
                         <line x1="100%" y1="0" x2="0" y2="100%" stroke="currentColor" stroke-width="2" />
                     </svg>
-                {:else if overallState == 2 || currentPlayer == 2}
-                    <svg width="16" height="16" class="text-blue-500">
+                {:else if overallState == 2 || !overallState && currentPlayer == 2}
+                    <svg width="16" height="16" class="mb-0.5 text-blue-500">
                         <circle cx="50%" cy="50%" r="45%" stroke="currentColor" stroke-width="2" fill="none" />
                     </svg>
                 {:else}
-                    <svg width="16" height="16">
+                    <svg width="16" height="16" class="mb-0.5">
                         <line x1="0" y1="0" x2="100%" y2="100%" stroke="currentColor" stroke-width="2" />
                         <line x1="100%" y1="0" x2="0" y2="100%" stroke="currentColor" stroke-width="2" />
                         <circle cx="50%" cy="50%" r="45%" stroke="currentColor" stroke-width="2" fill="none" />
@@ -301,17 +316,17 @@
                 {:else}
                     is on turn.
                     {#if twoPlayer && self == currentPlayer}
-                        <b>It is <span class:text-red-500={currentPlayer == 1} class:text-blue-500={currentPlayer == 2}>YOUR</span> {selfName ? "(" + selfName + ")" : ""} turn.</b>
+                        <span class="-ml-1"><b>It is <span class:text-red-500={currentPlayer == 1} class:text-blue-500={currentPlayer == 2}>YOUR</span> {selfName ? "(" + selfName + ")" : ""} turn.</b></span>
                     {:else if twoPlayer && self != currentPlayer}
-                        Waiting for <b class:text-red-500={currentPlayer == 1} class:text-blue-500={currentPlayer == 2}>{opponentName || "opponent"}</b>...
+                        <span class="-ml-1">Waiting for <b class:text-red-500={currentPlayer == 1} class:text-blue-500={currentPlayer == 2}>{opponentName || "opponent"}</b>&hellip;</span>
                     {/if}
                 {/if}
             </div>
         {/key}
     </div>
 
-    <div class="info min-w-38 px-4 h-100vh overflow-y-auto <md:w-full">
-        <div class="moves">
+    <div class="info min-w-38 px-4 h-full overflow-y-auto <md:w-full">
+        <div class="moves h-full">
             {#if twoPlayer}
                 <div class="move text-red-500">
                     <svg width="16" height="16">
@@ -339,7 +354,7 @@
 
 <style>
     .info .moves {
-        columns: 9.5rem auto;
+        @apply p-4 font-mono flex flex-col flex-wrap;
     }
     .move {
         @apply p-1 flex gap-2 p-1 items-center leading-none;
@@ -356,18 +371,19 @@
     .winner-1 {
         @apply text-red-500;
     }
-    .moves {
-        @apply p-4 font-mono;
-    }
     .board {
-        @apply grid grid-cols-3 grid-rows-3 gap-10 w-max h-max m-auto my-5;
+        @apply grid grid-cols-3 grid-rows-3 gap-10 w-max h-max m-auto my-5 flex-shrink-0;
     }
     .squares-container {
         @apply grid grid-cols-3 grid-rows-3 gap-5 w-max h-max opacity-35 relative;
     }
 
     .square {
-        @apply border-black border-solid border w-6 h-6 p-4 cursor-pointer flex items-center justify-center;
+        @apply border-black border-solid border w-6 h-6 p-4 cursor-pointer flex items-center justify-center transition-none;
+        aspect-ratio: 1 / 1;
+    }
+    :global(.dark) .square {
+        @apply border-white;
     }
     .squares-container:not(.current) .square:active {
         @apply bg-red-600/10;
@@ -385,15 +401,18 @@
         @apply cursor-not-allowed;
     }
     .square svg {
-        @apply w-full h-full;
+        @apply w-full h-full transition-none;
+    }
+    .square svg * {
+        @apply transition-none;
     }
     .square:hover, .square.hover {
         @apply bg-black/5;
     }
-    .square.hover.cross, .square:hover.cross {
+    .square.hover.cross, .square:hover.cross, .square.latest.cross {
         @apply text-red-500;
     }
-    .square.hover.circle, .square:hover.circle {
+    .square.hover.circle, .square:hover.circle, .square.latest.circle {
         @apply text-blue-500;
     }
     .highlighted {

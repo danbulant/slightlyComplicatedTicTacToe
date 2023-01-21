@@ -18,7 +18,7 @@
     }
 </script>
 
-<a href="/" class="arrow-back fixed top-0 left-0 w-4 h-4 m-4 p-2 transform transition-transform hover:-translate-x-1">
+<a href="/" class="text-black dark:text-white arrow-back fixed top-0 left-0 w-4 h-4 m-4 p-2 transform transition-transform hover:-translate-x-1">
     <svg width="16" height="16">
         <line y1="50%" x1="0" y2="50%" x2="100%" stroke="currentColor" stroke-width="2" />
         <line y1="50%" x1="0" y2="100%" x2="50%" stroke="currentColor" stroke-width="2" />
@@ -43,9 +43,6 @@
 {/if}
 
 <style>
-    a {
-        @apply text-black;
-    }
     * {
         @apply box-border;
     }
@@ -61,8 +58,17 @@
     input {
         @apply w-64 h-10 px-2 border border-gray-300 rounded-l-lg mt-4 my-0;
     }
+    :global(.dark) input {
+        @apply border-gray-400 text-white bg-black;
+    }
     button {
-        @apply w-64 h-10 px-2 border border-gray-300 bg-white rounded-r-lg mt-4 my-0;
+        @apply w-64 h-10 px-2 border border-gray-300 bg-white rounded-r-lg mt-4 my-0 cursor-pointer;
+    }
+    :global(.dark) button {
+        @apply bg-white/5 border-gray-700 text-white;
+    }
+    :global(.dark) button:hover {
+        @apply bg-white/10;
     }
     form {
         @apply h-50vh flex-grow-0;

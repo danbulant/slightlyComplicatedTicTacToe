@@ -4,7 +4,8 @@
     export var piece: number | "?";
     export var latest: boolean = false;
 </script>
-<div class="move select-none" class:latest on:mouseover on:mouseout>
+
+<div class="move select-none" class:latest on:mouseover on:mouseout on:focus on:blur>
     <span class="player player-{player}">
         {#if player == 1}
             <svg width="16" height="16">
@@ -45,6 +46,9 @@
     }
     .latest {
         @apply opacity-35;
+    }
+    :global(.dark) .latest {
+        @apply opacity-50;
     }
     .player {
         @apply inline-block w-1em h-1em;
