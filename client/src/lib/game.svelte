@@ -196,7 +196,7 @@
 
 <svelte:window bind:innerWidth />
 
-<a href="/" on:click={check} class="text-black dark:text-white arrow-back fixed top-0 left-0 w-4 h-4 m-4 p-2 transform transition-transform hover:-translate-x-1">
+<a transition:fly={{ duration, delay: duration * 0.5, x: -60, opacity: 0 }} href="/" on:click={check} class="text-black dark:text-white arrow-back fixed top-0 left-0 w-4 h-4 m-4 p-2 transform transition-transform hover:-translate-x-1">
     <svg width="16" height="16">
         <line y1="50%" x1="0" y2="50%" x2="100%" stroke="currentColor" stroke-width="2" />
         <line y1="50%" x1="0" y2="100%" x2="50%" stroke="currentColor" stroke-width="2" />
@@ -205,7 +205,8 @@
 </a>
 
 {#if !twoPlayer}
-    <div on:click={reset} on:keydown={reset} class="reload fixed top-0 left-10 w-4 h-4 m-4 p-2 transform transition-transform rotate-180 hover:rotate-360 active:rotate-540">
+    <!-- I have no idea why x is inverted here -->
+    <div transition:fly={{ duration, delay: duration, x: 120, opacity: 0 }} on:click={reset} on:keydown={reset} class="reload fixed top-0 left-10 w-4 h-4 m-4 p-2 transform transition-transform rotate-180 hover:rotate-360 active:rotate-540">
         <svg fill="currentColor" height="800px" width="800px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
         viewBox="0 0 489.645 489.645" xml:space="preserve" class="w-full h-full">
             <g>
@@ -236,7 +237,13 @@
 <main class:disabled={overallState} class="flex flex-wrap min-h-100vh min-w-full items-center">
     <div class="board relative p-8">
         {#each classes as className, i}
-            <div class:hover={hoveredPiece?.i == i} class:disabled={containerStates[i]} class:current={currentContainer === i} class:highlighted={highlightedContainer === i} class="squares-container {className}">
+            <div
+                transition:fade={{ duration, delay: duration * 0.3 * (i + 1) }}
+                class:hover={hoveredPiece?.i == i}
+                class:disabled={containerStates[i]}
+                class:current={currentContainer === i}
+                class:highlighted={highlightedContainer === i}
+                class="squares-container {className}">
                 {#each (new Array(9)) as _, j}
                     {@const moveIndex = moves.findIndex(cmove => cmove.i == i && cmove.j == j)}
                     {@const move = moves[moveIndex]}
@@ -330,7 +337,7 @@
         {/if}
 
         {#key currentPlayer}
-            <div class="absolute top-200 left-0 right-0 text-center flex items-center justify-center gap-2" in:fly={{ delay: 300, duration: 300, easing: quadOut, opacity: 0, y: 30 }} out:fly={{ delay: 0, duration: 300, easing: quadOut, opacity: 0, y: -30 }}>
+            <div class="absolute top-200 left-0 right-0 text-center flex items-center justify-center gap-2" in:fly={{ delay: 300 + 300 * moveDelayMultiplier * 1.5, duration: 300, easing: quadOut, opacity: 0, y: 30 }} out:fly={{ delay: 0, duration: 300, easing: quadOut, opacity: 0, y: -30 }}>
                 {#if overallState == 1 || !overallState && currentPlayer == 1}
                     <svg width="16" height="16" class="mb-0.5 text-red-500">
                         <line x1="0" y1="0" x2="100%" y2="100%" stroke="currentColor" stroke-width="2" />

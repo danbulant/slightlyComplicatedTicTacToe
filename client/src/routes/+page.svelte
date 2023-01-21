@@ -28,18 +28,18 @@
 
 {#if shown}
 <main class="flex items-center justify-center flex-col">
-    <div class="chooser">
+    <div class="chooser grid-cols-2 lt-md:grid-cols-1">
         <a href="/localplay" class="single" in:fly={{ delay: 0, duration, opacity: 0, y: 100, easing: quadOut }}>
             <h1>Local multiplayer</h1>
 
-            <div class="computer"></div>
+            <div class="computer lt-md:hidden"></div>
 
             <p>A game for two on a single device</p>
         </a>
         <a href="/multiplayer" class="multi" in:fly={{ delay: duration * 0.5, duration, opacity: 0, y: 100, easing: quadOut }}>
             <h1>Online multiplayer</h1>
 
-            <div class="multiplayer"></div>
+            <div class="multiplayer lt-md:hidden"></div>
     
             <p>Play with 2 devices, even across the ocean.</p>
         </a>
@@ -107,7 +107,7 @@
         @apply my-4 p-4 w-max m-auto h-100vh;
     }
     .chooser {
-        @apply grid grid-cols-2 items-center justify-center gap-8;
+        @apply grid items-center justify-center gap-8;
     }
     .chooser > a {
         @apply text-black no-underline cursor-pointer w-full p-8 border rounded-lg border-gray-400 border-solid;
