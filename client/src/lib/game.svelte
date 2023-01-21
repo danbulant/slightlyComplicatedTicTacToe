@@ -162,7 +162,7 @@
     }
 
     function check(e: MouseEvent) {
-        if(twoPlayer) return;
+        if(!moves.length) return;
         var confirmed = confirm("Are you sure you want to quit?");
         if(!confirmed) return e.preventDefault() || false;
     }
