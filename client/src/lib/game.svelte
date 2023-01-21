@@ -181,7 +181,7 @@
     var movesShown = false;
 
     const duration = 400;
-    var moveDelayMultiplier = 2;
+    var moveDelayMultiplier = 1;
 
     onMount(() => {
         let i = setTimeout(() => {
@@ -337,7 +337,7 @@
         {/if}
 
         {#key currentPlayer}
-            <div class="absolute top-200 left-0 right-0 text-center flex items-center justify-center gap-2" in:fly={{ delay: 300 + 300 * moveDelayMultiplier * 1.5, duration: 300, easing: quadOut, opacity: 0, y: 30 }} out:fly={{ delay: 0, duration: 300, easing: quadOut, opacity: 0, y: -30 }}>
+            <div class="absolute top-200 left-0 right-0 text-center flex items-center justify-center gap-2" in:fly={{ delay: 300 + duration * moveDelayMultiplier * 3, duration: 300, easing: quadOut, opacity: 0, y: 30 }} out:fly={{ delay: 0, duration: 300, easing: quadOut, opacity: 0, y: -30 }}>
                 {#if overallState == 1 || !overallState && currentPlayer == 1}
                     <svg width="16" height="16" class="mb-0.5 text-red-500">
                         <line x1="0" y1="0" x2="100%" y2="100%" stroke="currentColor" stroke-width="2" />
@@ -378,7 +378,7 @@
     {#if movesShown || innerWidth >= 1024}
         <div transition:fade={{ duration }} class="lg:hidden bg-black/40 fixed inset-0 z-10" on:click={() => movesShown = false} on:keydown={() => movesShown = false} />
 
-        <div transition:fly={{ delay: duration * moveDelayMultiplier, duration, x: 160, opacity: 0 }} class="info z-11 min-w-38 px-4 flex-grow-0 flex-shrink overflow-y-auto lt-lg:(absolute top-0 right-0 h-full bg-black)">
+        <div transition:fly={{ delay: duration * moveDelayMultiplier * 3, duration, x: 160, opacity: 0 }} class="info z-11 min-w-38 px-4 flex-grow-0 flex-shrink overflow-y-auto lt-lg:(absolute top-0 right-0 h-full bg-black)">
             <div class="moves">
                 <div class="move">
                     Moves
