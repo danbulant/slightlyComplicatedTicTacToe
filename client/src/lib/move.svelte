@@ -1,11 +1,13 @@
 <script lang="ts">
+	import { fade } from "svelte/transition";
+
     export var player: number;
     export var board: number | "?";
     export var piece: number | "?";
     export var latest: boolean = false;
 </script>
 
-<div class="move select-none" class:latest on:mouseover on:mouseout on:focus on:blur>
+<div class="move select-none" class:latest on:mouseover on:mouseout on:focus on:blur transition:fade={{ duration: latest ? 0 : 300 }}>
     <span class="player player-{player}">
         {#if player == 1}
             <svg width="16" height="16">

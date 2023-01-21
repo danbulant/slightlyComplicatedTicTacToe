@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { createEventDispatcher } from "svelte";
+	import { createEventDispatcher, onMount, tick } from "svelte";
 	import { quadOut } from "svelte/easing";
-	import { fly } from "svelte/transition";
+	import { draw, fade, fly } from "svelte/transition";
 	import Move from "./move.svelte";
 
     export var self: 1 | 2 = 1;
@@ -166,7 +166,35 @@
         var confirmed = confirm("Are you sure you want to quit?");
         if(!confirmed) return e.preventDefault() || false;
     }
+
+    async function randomMoves() {
+        let last = currentContainer;
+        for(let i = 0; i < 40; i++) {
+            addMove(last, Math.floor(Math.random() * 9));
+            await tick();
+            last = moves[moves.length - 1].j;
+        }
+    }
+
+    // randomMoves();
+
+    var movesShown = false;
+
+    const duration = 400;
+    var moveDelayMultiplier = 2;
+
+    onMount(() => {
+        let i = setTimeout(() => {
+            moveDelayMultiplier = 0;
+        }, duration * moveDelayMultiplier);
+
+        return () => clearTimeout(i);
+    });
+
+    let innerWidth = window.innerWidth;
 </script>
+
+<svelte:window bind:innerWidth />
 
 <a href="/" on:click={check} class="text-black dark:text-white arrow-back fixed top-0 left-0 w-4 h-4 m-4 p-2 transform transition-transform hover:-translate-x-1">
     <svg width="16" height="16">
@@ -191,6 +219,20 @@
     </div>
 {/if}
 
+{#if innerWidth < 1024}
+    <div transition:fly={{ duration, delay: 0, x: 60, opacity: 0 }} class="fixed top-0 right-0 w-4 h-4 m-4 p-2 menu cursor-pointer" on:click={() => movesShown = !movesShown} on:keydown={() => movesShown = !movesShown}>
+        <svg width=16 height=16>
+            <line y1="2" y2="2" x1="0" x2="100%" stroke="currentColor" stroke-width="2" />
+            <line y1="8" y2="8" x1="0" x2="100%" stroke="currentColor" stroke-width="2" />
+            <line y1="14" y2="14" x1="0" x2="100%" stroke="currentColor" stroke-width="2" />
+
+            <line y1="2" y2="2" x1="300%" x2="400%" stroke="currentColor" stroke-width="2" />
+            <line y1="8" y2="8" x1="300%" x2="400%" stroke="currentColor" stroke-width="2" />
+            <line y1="14" y2="14" x1="300%" x2="400%" stroke="currentColor" stroke-width="2" />
+        </svg>
+    </div>
+{/if}
+
 <main class:disabled={overallState} class="flex flex-wrap min-h-100vh min-w-full items-center">
     <div class="board relative p-8">
         {#each classes as className, i}
@@ -199,7 +241,7 @@
                     {@const moveIndex = moves.findIndex(cmove => cmove.i == i && cmove.j == j)}
                     {@const move = moves[moveIndex]}
                     <div
-                        class:latest={moveIndex == moves.length - 1}
+                        class:latest={moveIndex == moves.length - 1 && !hoveredPiece}
                         on:click={() => addMove(i, j)}
                         on:keydown={() => addMove(i, j)}
                         class:hover={hoveredPiece?.i == i && hoveredPiece.j == j}
@@ -242,22 +284,22 @@
                 {#if containerStates[i] == 1}
                     <div class="winner winner-1">
                         <svg width="16" height="16">
-                            <line x1="0" y1="0" x2="100%" y2="100%" stroke="currentColor" stroke-width="2" />
-                            <line x1="100%" y1="0" x2="0" y2="100%" stroke="currentColor" stroke-width="2" />
+                            <line transition:draw={{ duration: 500, easing: quadOut }} x1="0" y1="0" x2="100%" y2="100%" stroke="currentColor" stroke-width="2" />
+                            <line transition:draw={{ delay: 500, duration: 500, easing: quadOut }} x1="100%" y1="0" x2="0" y2="100%" stroke="currentColor" stroke-width="2" />
                         </svg>
                     </div>
                 {:else if containerStates[i] == 2}
                     <div class="winner winner-2">
                         <svg width="16" height="16">
-                            <circle cx="50%" cy="50%" r="45%" stroke="currentColor" stroke-width="2" fill="none" />
+                            <circle transition:draw={{ duration: 500, easing: quadOut }} cx="50%" cy="50%" r="45%" stroke="currentColor" stroke-width="2" fill="none" />
                         </svg>
                     </div>
                 {:else if containerStates[i] == 3}
                     <div class="winner winner-3">
                         <svg width="16" height="16">
-                            <line x1="0" y1="0" x2="100%" y2="100%" stroke="currentColor" stroke-width="2" />
-                            <line x1="100%" y1="0" x2="0" y2="100%" stroke="currentColor" stroke-width="2" />
-                            <circle cx="50%" cy="50%" r="45%" stroke="currentColor" stroke-width="2" fill="none" />
+                            <line transition:draw={{ duration: 500, easing: quadOut }} x1="0" y1="0" x2="100%" y2="100%" stroke="currentColor" stroke-width="2" />
+                            <line transition:draw={{ delay: 1000, duration: 500, easing: quadOut }} x1="100%" y1="0" x2="0" y2="100%" stroke="currentColor" stroke-width="2" />
+                            <circle transition:draw={{ delay: 500, duration: 500, easing: quadOut }} cx="50%" cy="50%" r="45%" stroke="currentColor" stroke-width="2" fill="none" />
                         </svg>
                     </div>
                 {/if}
@@ -267,22 +309,22 @@
         {#if overallState == 1}
             <div class="winner winner-1">
                 <svg width="16" height="16">
-                    <line x1="0" y1="0" x2="100%" y2="100%" stroke="currentColor" stroke-width="2" />
-                    <line x1="100%" y1="0" x2="0" y2="100%" stroke="currentColor" stroke-width="2" />
+                    <line transition:draw={{ duration: 500, easing: quadOut }} x1="0" y1="0" x2="100%" y2="100%" stroke="currentColor" stroke-width="2" />
+                    <line transition:draw={{ delay: 500, duration: 500, easing: quadOut }} x1="100%" y1="0" x2="0" y2="100%" stroke="currentColor" stroke-width="2" />
                 </svg>
             </div>
         {:else if overallState == 2}
             <div class="winner winner-2">
                 <svg width="16" height="16">
-                    <circle cx="50%" cy="50%" r="45%" stroke="currentColor" stroke-width="2" fill="none" />
+                    <circle transition:draw={{ duration: 500, easing: quadOut }} cx="50%" cy="50%" r="45%" stroke="currentColor" stroke-width="2" fill="none" />
                 </svg>
             </div>
         {:else if overallState == 3}
             <div class="winner winner-3">
                 <svg width="16" height="16">
-                    <line x1="0" y1="0" x2="100%" y2="100%" stroke="currentColor" stroke-width="2" />
-                    <line x1="100%" y1="0" x2="0" y2="100%" stroke="currentColor" stroke-width="2" />
-                    <circle cx="50%" cy="50%" r="45%" stroke="currentColor" stroke-width="2" fill="none" />
+                    <line transition:draw={{ duration: 500, easing: quadOut }} x1="0" y1="0" x2="100%" y2="100%" stroke="currentColor" stroke-width="2" />
+                    <line transition:draw={{ delay: 1000, duration: 500, easing: quadOut }} x1="100%" y1="0" x2="0" y2="100%" stroke="currentColor" stroke-width="2" />
+                    <circle transition:draw={{ delay: 500, duration: 500, easing: quadOut }} cx="50%" cy="50%" r="45%" stroke="currentColor" stroke-width="2" fill="none" />
                 </svg>
             </div>
         {/if}
@@ -325,36 +367,47 @@
         {/key}
     </div>
 
-    <div class="info min-w-38 px-4 h-full overflow-y-auto <md:w-full">
-        <div class="moves h-full">
-            {#if twoPlayer}
-                <div class="move text-red-500">
-                    <svg width="16" height="16">
-                        <line x1="0" y1="0" x2="100%" y2="100%" stroke="currentColor" stroke-width="2" />
-                        <line x1="100%" y1="0" x2="0" y2="100%" stroke="currentColor" stroke-width="2" />
-                    </svg>
-                    {self == 1 ? (selfName || "you") : (opponentName || "opponent")}
+    
+    {#if movesShown || innerWidth >= 1024}
+        <div transition:fade={{ duration }} class="lg:hidden bg-black/40 fixed inset-0 z-10" on:click={() => movesShown = false} on:keydown={() => movesShown = false} />
+
+        <div transition:fly={{ delay: duration * moveDelayMultiplier, duration, x: 160, opacity: 0 }} class="info z-11 min-w-38 px-4 flex-grow-0 flex-shrink overflow-y-auto lt-lg:(absolute top-0 right-0 h-full bg-black)">
+            <div class="moves">
+                <div class="move">
+                    Moves
+                    {#key moves.length}
+                        <span in:fly={{ delay: 300, duration: 300, easing: quadOut, opacity: 0, y: 16 }} out:fly={{ delay: 0, duration: 300, easing: quadOut, opacity: 0, y: -16 }} class="rounded p-1 -ml-1 bg-gray-300 dark:bg-gray-800">{moves.length}</span>
+                    {/key}
                 </div>
-                <div class="move text-blue-500">
-                    <svg width="16" height="16">
-                        <circle cx="50%" cy="50%" r="45%" stroke="currentColor" stroke-width="2" fill="none" />
-                    </svg>
-                    {self == 2 ? (selfName || "you") : (opponentName || "opponent")}
-                </div>
-            {/if}
-            {#each moves as move}
-                <Move player={move.p} board={move.i} piece={move.j} on:mouseover={() => hoveredPiece = { i: move.i, j: move.j }} on:mouseout={() => { if(hoveredPiece?.j == move.j && hoveredPiece.i == move.i) hoveredPiece = null }} />
-            {/each}
-            <Move latest player={currentPlayer} board={hoveredPiece?.i ?? "?"} piece={hoveredPiece?.j ?? "?"} />
+                {#if twoPlayer}
+                    <div class="move text-red-500">
+                        <svg width="16" height="16">
+                            <line x1="0" y1="0" x2="100%" y2="100%" stroke="currentColor" stroke-width="2" />
+                            <line x1="100%" y1="0" x2="0" y2="100%" stroke="currentColor" stroke-width="2" />
+                        </svg>
+                        {self == 1 ? (selfName || "you") : (opponentName || "opponent")}
+                    </div>
+                    <div class="move text-blue-500">
+                        <svg width="16" height="16">
+                            <circle cx="50%" cy="50%" r="45%" stroke="currentColor" stroke-width="2" fill="none" />
+                        </svg>
+                        {self == 2 ? (selfName || "you") : (opponentName || "opponent")}
+                    </div>
+                {/if}
+                {#each moves as move}
+                    <Move player={move.p} board={move.i} piece={move.j} on:mouseover={() => hoveredPiece = { i: move.i, j: move.j }} on:mouseout={() => { if(hoveredPiece?.j == move.j && hoveredPiece.i == move.i) hoveredPiece = null }} />
+                {/each}
+                <Move latest player={currentPlayer} board={hoveredPiece?.i ?? "?"} piece={hoveredPiece?.j ?? "?"} />
+            </div>
         </div>
-    </div>
+    {/if}
 </main>
 
 
 
 <style>
     .info .moves {
-        @apply p-4 font-mono flex flex-col flex-wrap;
+        @apply p-4 font-mono flex flex-col flex-wrap max-w-185 m-auto;
     }
     .move {
         @apply p-1 flex gap-2 p-1 items-center leading-none;
@@ -436,5 +489,32 @@
     }
     .top.left, .top.middle, .middle-middle, .bottom.right, .middle.left, .top.left .square:last-child, .top.middle .square:last-child, .middle-middle .square:last-child, .bottom.right .square:last-child, .middle.left .square:last-child {
         @apply rounded-br-2xl;
+    }
+
+    .menu svg line {
+        transition: transform 300ms ease-in-out;
+    }
+
+    .menu svg line:nth-child(1) {
+        transition-delay: 0ms;
+    }
+    .menu svg line:nth-child(2) {
+        transition-delay: 50ms;
+    }
+    .menu svg line:nth-child(3) {
+        transition-delay: 150ms;
+    }
+    .menu svg line:nth-child(4) {
+        transition-delay: 0ms;
+    }
+    .menu svg line:nth-child(5) {
+        transition-delay: 50ms;
+    }
+    .menu svg line:nth-child(6) {
+        transition-delay: 150ms;
+    }
+
+    .menu:hover svg line {
+        transform: translateX(-300%);
     }
 </style>
