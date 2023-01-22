@@ -88,6 +88,14 @@
         mask: url('/network.svg') no-repeat center;
         -webkit-mask: url('/network.svg') no-repeat center;
     }
+    @media (max-height: 728px) {
+        .computer, .multiplayer {
+            display: none;
+        }
+        h1 {
+            margin: 0;
+        }
+    }
     :global(.dark) .computer, :global(.dark) .multiplayer {
         @apply bg-white;
     }

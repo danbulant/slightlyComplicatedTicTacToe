@@ -13,9 +13,19 @@
             document.documentElement.classList.remove("dark");
         }
     }
+
+    var el: HTMLDivElement
+    function clicked() {
+        if(innerWidth < 768 || innerHeight < 768) {
+            el.requestFullscreen({
+                navigationUI: "hide"
+            });
+        }
+    }
 </script>
 
-<div class="overflow-hidden w-100vw h-100vh dark:bg-black dark:text-white">
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<div class="overflow-hidden w-100vw h-100vh dark:bg-black dark:text-white" on:click={clicked} bind:this={el}>
     <PageTransition url={data.url}>
         <slot />
     </PageTransition>
@@ -27,5 +37,6 @@
     }
     :global(*) {
         @apply transition-colors;
+        -webkit-tap-highlight-color: transparent;
     }
 </style>

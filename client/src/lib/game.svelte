@@ -191,10 +191,11 @@
         return () => clearTimeout(i);
     });
 
-    let innerWidth = window.innerWidth;
+    let innerWidth = typeof window !== "undefined" ? window.innerWidth : 0;
+    let innerHeight = typeof window !== "undefined" ? window.innerHeight : 0;
 </script>
 
-<svelte:window bind:innerWidth />
+<svelte:window bind:innerWidth bind:innerHeight on:click={() => hoveredPiece = null} />
 
 <a transition:fly={{ duration, delay: duration * 0.5, x: -60, opacity: 0 }} href="/" on:click={check} class="text-black dark:text-white arrow-back fixed top-0 left-0 w-4 h-4 m-4 p-2 transform transition-transform hover:-translate-x-1">
     <svg width="16" height="16">
@@ -234,8 +235,8 @@
     </div>
 {/if}
 
-<main class:disabled={overallState} class="flex flex-wrap min-h-100vh min-w-full items-center">
-    <div class="board relative p-8">
+<main class:disabled={overallState} class="flex flex-wrap h-100vh w-100vw overflow-hidden items-center" style:--vw={innerWidth} style:--vh={innerHeight} style:--vmin={Math.min(innerWidth, innerHeight)}>
+    <div class="board relative p-8" style:translate="{Math.min(0, (1 - innerWidth / 768) * -50)}% {Math.min(0, (1 - innerHeight / 856) * -50)}%">
         {#each classes as className, i}
             <div
                 transition:fade={{ duration, delay: duration * 0.3 * (i + 1) }}
@@ -247,6 +248,7 @@
                 {#each (new Array(9)) as _, j}
                     {@const moveIndex = moves.findIndex(cmove => cmove.i == i && cmove.j == j)}
                     {@const move = moves[moveIndex]}
+                    <!-- svelte-ignore a11y-mouse-events-have-key-events -->
                     <div
                         class:latest={moveIndex == moves.length - 1 && !hoveredPiece}
                         on:click={() => addMove(i, j)}
@@ -258,19 +260,21 @@
                         class:cross={move && move.p==1}
                         class:circle={move && move.p==2}
                         on:mouseover={() => { if(currentContainer == i) hoveredPiece = { i, j } }}
-                        on:focus={() => { if(currentContainer == i) hoveredPiece = { i, j }}}
+                        
                         on:mouseleave={() => { if(hoveredPiece?.i == i && hoveredPiece.j == j) hoveredPiece = null; }}
                         >
+                        <!-- Focus breaks phones -->
+                        <!-- on:focus={() => { if(currentContainer == i) hoveredPiece = { i, j }}} -->
 
                         {#if move}
                             {#if move.p == 1}
                                 <svg width="16" height="16">
-                                    <line x1="0" y1="0" x2="100%" y2="100%" stroke="currentColor" stroke-width="2" />
-                                    <line x1="100%" y1="0" x2="0" y2="100%" stroke="currentColor" stroke-width="2" />
+                                    <line transition:draw={{ duration: 300, easing: quadOut }} x1="0" y1="0" x2="100%" y2="100%" stroke="currentColor" stroke-width="2" />
+                                    <line transition:draw={{ delay: 200, duration: 300, easing: quadOut }} x1="100%" y1="0" x2="0" y2="100%" stroke="currentColor" stroke-width="2" />
                                 </svg>
                             {:else}
                                 <svg width="16" height="16">
-                                    <circle cx="50%" cy="50%" r="45%" stroke="currentColor" stroke-width="2" fill="none" />
+                                    <circle transition:draw={{ duration: 400, easing: quadOut }} cx="50%" cy="50%" r="45%" stroke="currentColor" stroke-width="2" fill="none" />
                                 </svg>
                             {/if}
                         {:else}
@@ -375,15 +379,15 @@
     </div>
 
     
-    {#if movesShown || innerWidth >= 1024}
-        <div transition:fade={{ duration }} class="lg:hidden bg-black/40 fixed inset-0 z-10" on:click={() => movesShown = false} on:keydown={() => movesShown = false} />
+    {#if movesShown || innerWidth >= 1024 || innerWidth / innerHeight > 1.4}
+        <div transition:fade={{ duration }} class:hidden={innerWidth / innerHeight > 1.4} class="lg:hidden bg-black/40 fixed inset-0 z-10" on:click={() => movesShown = false} on:keydown={() => movesShown = false} />
 
         <div transition:fly={{ delay: duration * moveDelayMultiplier * 3, duration, x: 160, opacity: 0 }} class="info z-11 min-w-38 px-4 flex-grow-0 flex-shrink overflow-y-auto h-100vh lt-lg:(absolute top-0 right-0 bg-black)">
             <div class="moves">
                 <div class="move">
                     Moves
                     {#key moves.length}
-                        <span in:fly={{ delay: 300, duration: 300, easing: quadOut, opacity: 0, y: 16 }} out:fly={{ delay: 0, duration: 300, easing: quadOut, opacity: 0, y: -16 }} class="rounded p-1 -ml-1 bg-gray-300 dark:bg-gray-800">{moves.length}</span>
+                        <span in:fly|local={{ delay: 300, duration: 300, easing: quadOut, opacity: 0, y: 16 }} out:fly|local={{ delay: 0, duration: 300, easing: quadOut, opacity: 0, y: -16 }} class="rounded p-1 -ml-1 bg-gray-300 dark:bg-gray-800">{moves.length}</span>
                     {/key}
                 </div>
                 {#if twoPlayer}
@@ -433,6 +437,8 @@
     }
     .board {
         @apply grid grid-cols-3 grid-rows-3 gap-10 w-max h-max m-auto my-5 flex-shrink-0;
+        aspect-ratio: 1 / 1;
+        scale: min(1, var(--vw) / 768, var(--vh) / 856);
     }
     .squares-container {
         @apply grid grid-cols-3 grid-rows-3 gap-5 w-max h-max opacity-35 relative;
