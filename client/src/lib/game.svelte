@@ -129,29 +129,21 @@
 
         if(containerStates[0] == containerStates[1] && containerStates[1] == containerStates[2] && containerStates[0] != 0) {
             overallState = containerStates[0];
-        }
-        if(containerStates[3] == containerStates[4] && containerStates[4] == containerStates[5] && containerStates[3] != 0) {
+        } else if(containerStates[3] == containerStates[4] && containerStates[4] == containerStates[5] && containerStates[3] != 0) {
             overallState = containerStates[3];
-        }
-        if(containerStates[6] == containerStates[7] && containerStates[7] == containerStates[8] && containerStates[6] != 0) {
+        } else if(containerStates[6] == containerStates[7] && containerStates[7] == containerStates[8] && containerStates[6] != 0) {
             overallState = containerStates[6];
-        }
-        if(containerStates[0] == containerStates[3] && containerStates[3] == containerStates[6] && containerStates[0] != 0) {
+        } else if(containerStates[0] == containerStates[3] && containerStates[3] == containerStates[6] && containerStates[0] != 0) {
             overallState = containerStates[0];
-        }
-        if(containerStates[1] == containerStates[4] && containerStates[4] == containerStates[7] && containerStates[1] != 0) {
+        } else if(containerStates[1] == containerStates[4] && containerStates[4] == containerStates[7] && containerStates[1] != 0) {
             overallState = containerStates[1];
-        }
-        if(containerStates[2] == containerStates[5] && containerStates[5] == containerStates[8] && containerStates[2] != 0) {
+        } else if(containerStates[2] == containerStates[5] && containerStates[5] == containerStates[8] && containerStates[2] != 0) {
             overallState = containerStates[2];
-        }
-        if(containerStates[0] == containerStates[4] && containerStates[4] == containerStates[8] && containerStates[0] != 0) {
+        } else if(containerStates[0] == containerStates[4] && containerStates[4] == containerStates[8] && containerStates[0] != 0) {
             overallState = containerStates[0];
-        }
-        if(containerStates[2] == containerStates[4] && containerStates[4] == containerStates[6] && containerStates[2] != 0) {
+        } else if(containerStates[2] == containerStates[4] && containerStates[4] == containerStates[6] && containerStates[2] != 0) {
             overallState = containerStates[2];
-        }
-        if(containerStates.every(state => state != 0)) {
+        } else if(containerStates.every(state => state != 0)) {
             overallState = 3;
         }
     }
