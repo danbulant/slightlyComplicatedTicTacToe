@@ -44,7 +44,7 @@
             <p>Play with 2 devices, even across the ocean.</p>
         </a>
     </div>
-    <div class="rules" in:fly={{ delay: duration, duration, opacity: 0, y: 100, easing: quadOut }}>
+    <a href="/rules" class="rules" in:fly={{ delay: duration, duration, opacity: 0, y: 100, easing: quadOut }}>
         <div class="icon">
             <svg fill="currentColor" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
                 width="800px" height="800px" viewBox="0 0 973.1 973.1" xml:space="preserve"
@@ -65,7 +65,7 @@
             <h1>Rules</h1>
             <p>How do I play the game?</p>
         </div>
-    </div>
+    </a>
     <div class="darkmode">
         <button on:click={toggleDarkmode} in:fly={{ delay: duration * 1.5, duration, opacity: 0, y: 100, easing: quadOut }}>
             <DarkmodeIcon />
@@ -130,13 +130,13 @@
         @apply bg-white/10;
     }
     .rules {
-        @apply cursor-not-allowed text-gray-500 flex justify-center items-center w-full my-8 p-4 border rounded-lg border-gray-400 border-solid;
+        @apply text-gray-500 flex justify-center items-center w-full my-8 p-4 border rounded-lg border-gray-400 border-solid;
     }
     .rules:hover {
-        @apply bg-red-500/3;
+        @apply bg-black/10;
     }
-    .rules:active {
-        @apply bg-red-500/10;
+    :global(.dark) .rules:hover {
+        @apply bg-white/10;
     }
     .icon {
         @apply h-20 w-20 mr-4;
