@@ -3,8 +3,8 @@
 	import { quadOut } from "svelte/easing";
 	import { draw, fade, fly } from "svelte/transition";
 	import Move from "./move.svelte";
-	import { DEFAULT_TRANSITION_DURATION } from "./config";
-	import BackButton from "./backButton.svelte";
+    import { DEFAULT_TRANSITION_DURATION } from "./config";
+    import BackButton from "./backButton.svelte";
 
     export var self: 1 | 2 = 1;
     export var twoPlayer: boolean = false;
