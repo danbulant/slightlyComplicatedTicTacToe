@@ -5,6 +5,9 @@
 	import Move from "./move.svelte";
     import { DEFAULT_TRANSITION_DURATION } from "./config";
     import BackButton from "./backButton.svelte";
+    import GameAudio from "./GameAudio";
+    import sndMove1 from "./assets/fx/jump.wav";
+    import sndMove2 from "./assets/fx/accomplished.wav";
 
     export var self: 1 | 2 = 1;
     export var twoPlayer: boolean = false;
@@ -72,6 +75,7 @@
         if(overallState) return;
         moves.push({ p: currentPlayer, i, j });
         moves = moves;
+        playMoveSound();
 
         dispatch("move", { i, j, p: currentPlayer });
 
@@ -177,12 +181,40 @@
     const duration = DEFAULT_TRANSITION_DURATION;
     var moveDelayMultiplier = 1;
 
+    const moveSounds = [sndMove1, sndMove2].map(src => new GameAudio(src));
+
+    function playMoveSound() {
+        const track = moveSounds[currentPlayer - 1];
+
+        if (track.track && track.canPlay)
+            track.track.play();
+    }
+
+    function playRandomMoveSound() {
+        const playableTracks: GameAudio[] = [];
+        for (const ga of moveSounds)
+            if (ga.canPlay) playableTracks.push(ga);
+
+        if (!playableTracks.length) return;
+
+        const rand = Math.floor(Math.random() * playableTracks.length);
+        const track = playableTracks[rand];
+
+        if (track.track) track.track.play();
+    }
+
     onMount(() => {
         let i = setTimeout(() => {
             moveDelayMultiplier = 0;
         }, duration * moveDelayMultiplier);
 
-        return () => clearTimeout(i);
+        const cleanupFns = moveSounds.map(ga => ga.onMount());
+
+        return () => {
+            clearTimeout(i);
+
+            cleanupFns.every(fn => fn ? fn() : null);
+        };
     });
 
     let innerWidth = typeof window !== "undefined" ? window.innerWidth : 0;
