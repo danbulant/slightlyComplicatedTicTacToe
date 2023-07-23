@@ -20,12 +20,14 @@ export default class GameAudio {
 
   onMount() {
     if (!this.track) return;
-    this.track.addEventListener('canplay', this.onCanPlay.bind(this));
+
+    const handleTrackCanPlay = this.onCanPlay.bind(this);
+    this.track.addEventListener('canplay', handleTrackCanPlay);
 
     return () => {
       if (!this.track) return;
 
-      this.track.removeEventListener('canplay', this.onCanPlay.bind(this));
+      this.track.removeEventListener('canplay', handleTrackCanPlay);
       this.offCanPlay();
     };
   }
