@@ -1,5 +1,6 @@
 <script>
 	import DarkmodeIcon from "$lib/DarkmodeIcon.svelte";
+	import RulesDialog from "$lib/RulesDialog.svelte";
 	import { themeStore } from "$lib/themeStore";
     import { onMount } from "svelte";
 	import { quadOut } from "svelte/easing";
@@ -20,6 +21,8 @@
             $themeStore = "dark";
         }
     }
+
+    let rulesVisible = false;
 </script>
 
 <svelte:head>
@@ -44,7 +47,7 @@
             <p>Play with 2 devices, even across the ocean.</p>
         </a>
     </div>
-    <div class="rules" in:fly={{ delay: duration, duration, opacity: 0, y: 100, easing: quadOut }}>
+    <div class="rules" on:click={() => rulesVisible = true} on:keydown={() => {}} in:fly={{ delay: duration, duration, opacity: 0, y: 100, easing: quadOut }}>
         <div class="icon">
             <svg fill="currentColor" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
                 width="800px" height="800px" viewBox="0 0 973.1 973.1" xml:space="preserve"
@@ -75,7 +78,9 @@
 </main>
 {/if}
 
-<style>
+<RulesDialog bind:visible={rulesVisible} />
+
+<style lang="postcss">
     .computer {
         @apply w-full bg-black;
         aspect-ratio: 1/1;
@@ -130,13 +135,13 @@
         @apply bg-white/10;
     }
     .rules {
-        @apply cursor-not-allowed text-gray-500 flex justify-center items-center w-full my-8 p-4 border rounded-lg border-gray-400 border-solid;
+        @apply cursor-pointer flex justify-center items-center w-full my-8 p-4 border rounded-lg border-gray-400 border-solid transition-none;
     }
     .rules:hover {
-        @apply bg-red-500/3;
+        @apply bg-black/10 duration-150;
     }
-    .rules:active {
-        @apply bg-red-500/10;
+    :global(.dark) .rules:hover {
+        @apply bg-white/10;
     }
     .icon {
         @apply h-20 w-20 mr-4;

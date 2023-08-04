@@ -10,6 +10,13 @@
     export var twoPlayer: boolean = false;
     export var selfName: string | null = null;
     export var opponentName: string | null = null;
+    export var readonly: boolean = false;
+    export var defaultHighlightedContainer: number | null = null;
+    export var defaultHoveredPiece: { i: number, j: number } | null = null;
+    export var autoCalculateState: boolean = true;
+    export var showMoveList: boolean = true;
+    export var innerWidthOverride: number | null = null;
+    export var innerHeightOverride: number | null = null;
 
     const dispatch = createEventDispatcher();
 
@@ -25,11 +32,11 @@
         'bottom right'
     ];
 
-    var hoveredPiece: null | { i: number, j: number } = null;
+    var hoveredPiece: null | { i: number, j: number } = defaultHoveredPiece;
 
-    var highlightedContainer: null | number = null;
+    var highlightedContainer: null | number = defaultHighlightedContainer;
 
-    $: highlightedContainer = hoveredPiece ? highlightContainerByPiece(hoveredPiece.j) : null;
+    $: highlightedContainer = hoveredPiece ? highlightContainerByPiece(hoveredPiece.j) : defaultHighlightedContainer;
 
     function highlightContainerByPiece(j: number) {
         if(!containerStates[j]) return j;
@@ -47,7 +54,7 @@
     var currentContainer: number = 4;
     var currentPlayer: 1 | 2 = 1;
 
-    var moves: { p: 1 | 2, i: number, j: number }[] = [];
+    export var moves: { p: 1 | 2, i: number, j: number }[] = [];
 
     $: currentContainer = getCurrentContainer(moves);
     $: currentPlayer = moves[moves.length - 1]?.p == 1 ? 2 : 1;
@@ -61,10 +68,11 @@
         return backtrack() ?? -1;
     }
 
-    let containerStates = new Array(9).fill(0);
-    let overallState = 0;
+    export let containerStates = new Array(9).fill(0);
+    export let overallState = 0;
 
     function addMove(i: number, j: number) {
+        if(readonly) return;
         if(moves.find(move => move.i == i && move.j == j))
             return;
         if(currentContainer !== i) return;
@@ -97,6 +105,7 @@
     export { addPlayerMove };
 
     function updateContainerStates() {
+        if(!autoCalculateState) return;
         for(var i in containerStates) {
             if(containerStates[i]) continue;
             var containerMoves = moves.filter(move => move.i === Number(i));
@@ -153,6 +162,7 @@
     function reset() {
         moves = [];
         containerStates = new Array(9).fill(0);
+        overallState = 0;
     }
 
     function check(e: MouseEvent) {
@@ -186,15 +196,24 @@
         return () => clearTimeout(i);
     });
 
-    let innerWidth = typeof window !== "undefined" ? window.innerWidth : 0;
-    let innerHeight = typeof window !== "undefined" ? window.innerHeight : 0;
+    let winnerWidth = typeof window !== "undefined" ? window.innerWidth : 0;
+    let winnerHeight = typeof window !== "undefined" ? window.innerHeight : 0;
+    let innerWidth = innerWidthOverride || winnerWidth;
+    let innerHeight = innerHeightOverride || winnerHeight;
+
+    $: innerWidth = innerWidthOverride || winnerWidth;
+    $: innerHeight = innerHeightOverride || winnerHeight;
+
+    updateContainerStates();
 </script>
 
-<svelte:window bind:innerWidth bind:innerHeight on:click={() => hoveredPiece = null} />
+<svelte:window bind:innerWidth={winnerWidth} bind:innerHeight={winnerHeight} on:click={() => hoveredPiece = defaultHoveredPiece} />
 
+{#if !readonly}
     <BackButton href="/" on:click={check}/>
+{/if}
 
-{#if !twoPlayer}
+{#if !twoPlayer && !readonly}
     <!-- I have no idea why x is inverted here -->
     <div transition:fly={{ duration, delay: duration, x: 120, opacity: 0 }} on:click={reset} on:keydown={reset} class="reload fixed top-0 left-10 w-4 h-4 m-4 p-2 transform transition-transform rotate-180 hover:rotate-360 active:rotate-540">
         <svg fill="currentColor" height="800px" width="800px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
@@ -210,7 +229,7 @@
     </div>
 {/if}
 
-{#if innerWidth < 1024}
+{#if innerWidth < 1024 && showMoveList}
     <div transition:fly={{ duration, delay: 0, x: 60, opacity: 0 }} class="fixed top-0 right-0 w-4 h-4 m-4 p-2 menu cursor-pointer" on:click={() => movesShown = !movesShown} on:keydown={() => movesShown = !movesShown}>
         <svg width=16 height=16>
             <line y1="2" y2="2" x1="0" x2="100%" stroke="currentColor" stroke-width="2" />
@@ -224,7 +243,7 @@
     </div>
 {/if}
 
-<main class:disabled={overallState} class="flex flex-wrap h-100vh w-100vw overflow-hidden items-center" style:--vw={innerWidth} style:--vh={innerHeight} style:--vmin={Math.min(innerWidth, innerHeight)}>
+<main class:disabled={overallState} class:fullsize={!innerHeightOverride && !innerWidthOverride} class="flex flex-wrap overflow-hidden items-center" style:--vw={innerWidth} style:--vh={innerHeight} style:--vmin={Math.min(innerWidth, innerHeight)}>
     <div class="board relative p-8" style:translate="{Math.min(0, (1 - innerWidth / 768) * -50)}% {Math.min(0, (1 - innerHeight / 856) * -50)}%">
         {#each classes as className, i}
             <div
@@ -249,8 +268,8 @@
                         class:cross={move && move.p==1}
                         class:circle={move && move.p==2}
                         on:mouseover={() => { if(currentContainer == i) hoveredPiece = { i, j } }}
-                        
-                        on:mouseleave={() => { if(hoveredPiece?.i == i && hoveredPiece.j == j) hoveredPiece = null; }}
+
+                        on:mouseleave={() => { if(hoveredPiece?.i == i && hoveredPiece.j == j) hoveredPiece = defaultHoveredPiece; }}
                         >
                         <!-- Focus breaks phones -->
                         <!-- on:focus={() => { if(currentContainer == i) hoveredPiece = { i, j }}} -->
@@ -367,8 +386,8 @@
         {/key}
     </div>
 
-    
-    {#if movesShown || innerWidth >= 1024 || innerWidth / innerHeight > 1.4}
+
+    {#if showMoveList && (movesShown || innerWidth >= 1024 || innerWidth / innerHeight > 1.4)}
         <div transition:fade={{ duration }} class:hidden={innerWidth / innerHeight > 1.4} class="lg:hidden bg-black/40 fixed inset-0 z-10" on:click={() => movesShown = false} on:keydown={() => movesShown = false} />
 
         <div transition:fly={{ delay: duration * moveDelayMultiplier * 3, duration, x: 160, opacity: 0 }} class="info z-11 min-w-38 px-4 flex-grow-0 flex-shrink overflow-y-auto h-100vh lt-lg:(absolute top-0 right-0 bg-black)">
@@ -395,7 +414,7 @@
                     </div>
                 {/if}
                 {#each moves as move}
-                    <Move player={move.p} board={move.i} piece={move.j} on:mouseover={() => hoveredPiece = { i: move.i, j: move.j }} on:mouseout={() => { if(hoveredPiece?.j == move.j && hoveredPiece.i == move.i) hoveredPiece = null }} />
+                    <Move player={move.p} board={move.i} piece={move.j} on:mouseover={() => hoveredPiece = { i: move.i, j: move.j }} on:mouseout={() => { if(hoveredPiece?.j == move.j && hoveredPiece.i == move.i) hoveredPiece = defaultHoveredPiece }} />
                 {/each}
                 <Move latest player={currentPlayer} board={hoveredPiece?.i ?? "?"} piece={hoveredPiece?.j ?? "?"} />
             </div>
@@ -404,8 +423,10 @@
 </main>
 
 
-
-<style>
+<style lang="postcss">
+    .fullsize {
+        @apply h-100vh w-100vw;
+    }
     .info .moves {
         @apply p-4 font-mono flex flex-col flex-wrap max-w-185 m-auto;
     }
