@@ -31,12 +31,31 @@
     </PageTransition>
 </div>
 
-<style>
+<style lang="postcss">
     :global(:root), :global(body) {
         @apply overflow-hidden w-100vw;
     }
     :global(*) {
         @apply transition-colors;
         -webkit-tap-highlight-color: transparent;
+    }
+    :global(::-webkit-scrollbar) {
+        width: 10px;
+    }
+    :global(::-webkit-scrollbar-thumb) {
+        background: #d8d8d8;
+        border-radius: 5px;
+    }
+    :global(.dark ::-webkit-scrollbar-thumb) {
+        background: #2e2e2e;
+    }
+    :global(::-webkit-scrollbar-track) {
+        background: transparent;
+    }
+    :global(::-webkit-scrollbar-button) {
+        display: none;
+    }
+    :global(::-webkit-scrollbar-track-piece) {
+        background: transparent;
     }
 </style>
