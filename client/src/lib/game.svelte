@@ -156,6 +156,7 @@
     function check(e: MouseEvent) {
         if(!moves.length) return;
         var confirmed = confirm("Are you sure you want to quit?");
+        // @ts-ignore
         if(!confirmed) return e.preventDefault() || false;
     }
 
@@ -287,8 +288,8 @@
                 {#if containerStates[i] == 1}
                     <div class="winner winner-1">
                         <svg width="16" height="16">
-                            <line transition:draw={{ duration: 500, easing: quadOut }} x1="0" y1="0" x2="100%" y2="100%" stroke="currentColor" stroke-width="2" />
-                            <line transition:draw={{ delay: 500, duration: 500, easing: quadOut }} x1="100%" y1="0" x2="0" y2="100%" stroke="currentColor" stroke-width="2" />
+                            <line transition:draw={{ duration: 500, easing: quadOut }} x1="0" y1="0" x2="100%" y2="100%" stroke="currentColor" stroke-width="4" />
+                            <line transition:draw={{ delay: 500, duration: 500, easing: quadOut }} x1="100%" y1="0" x2="0" y2="100%" stroke="currentColor" stroke-width="4" />
                         </svg>
                     </div>
                 {:else if containerStates[i] == 2}
@@ -300,8 +301,8 @@
                 {:else if containerStates[i] == 3}
                     <div class="winner winner-3">
                         <svg width="16" height="16">
-                            <line transition:draw={{ duration: 500, easing: quadOut }} x1="0" y1="0" x2="100%" y2="100%" stroke="currentColor" stroke-width="2" />
-                            <line transition:draw={{ delay: 1000, duration: 500, easing: quadOut }} x1="100%" y1="0" x2="0" y2="100%" stroke="currentColor" stroke-width="2" />
+                            <line transition:draw={{ duration: 500, easing: quadOut }} x1="0" y1="0" x2="100%" y2="100%" stroke="currentColor" stroke-width="4" />
+                            <line transition:draw={{ delay: 1000, duration: 500, easing: quadOut }} x1="100%" y1="0" x2="0" y2="100%" stroke="currentColor" stroke-width="4" />
                             <circle transition:draw={{ delay: 500, duration: 500, easing: quadOut }} cx="50%" cy="50%" r="45%" stroke="currentColor" stroke-width="2" fill="none" />
                         </svg>
                     </div>
