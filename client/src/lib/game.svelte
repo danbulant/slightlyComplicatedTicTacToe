@@ -3,6 +3,8 @@
 	import { quadOut } from "svelte/easing";
 	import { draw, fade, fly } from "svelte/transition";
 	import Move from "./move.svelte";
+    import { DEFAULT_TRANSITION_DURATION } from "./config";
+    import BackButton from "./backButton.svelte";
 
     export var self: 1 | 2 = 1;
     export var twoPlayer: boolean = false;
@@ -172,7 +174,7 @@
 
     var movesShown = false;
 
-    const duration = 400;
+    const duration = DEFAULT_TRANSITION_DURATION;
     var moveDelayMultiplier = 1;
 
     onMount(() => {
@@ -189,13 +191,7 @@
 
 <svelte:window bind:innerWidth bind:innerHeight on:click={() => hoveredPiece = null} />
 
-<a transition:fly={{ duration, delay: duration * 0.5, x: -60, opacity: 0 }} href="/" on:click={check} class="text-black dark:text-white arrow-back fixed top-0 left-0 w-4 h-4 m-4 p-2 transform transition-transform hover:-translate-x-1">
-    <svg width="16" height="16">
-        <line y1="50%" x1="0" y2="50%" x2="100%" stroke="currentColor" stroke-width="2" />
-        <line y1="50%" x1="0" y2="100%" x2="50%" stroke="currentColor" stroke-width="2" />
-        <line y1="50%" x1="0" y2="0" x2="50%" stroke="currentColor" stroke-width="2" />
-    </svg>
-</a>
+<BackButton href="/" onclick={check}/>
 
 {#if !twoPlayer}
     <!-- I have no idea why x is inverted here -->
