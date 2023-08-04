@@ -6,8 +6,8 @@
     import { DEFAULT_TRANSITION_DURATION } from "./config";
     import BackButton from "./backButton.svelte";
     import GameAudio from "./GameAudio";
-    import sndMove1 from "./assets/fx/jump.wav";
-    import sndMove2 from "./assets/fx/accomplished.wav";
+    import sndLocalMove from "./assets/fx/localMove.wav";
+    import sndRemoteMove from "./assets/fx/remoteMove.mp3";
 
     export var self: 1 | 2 = 1;
     export var twoPlayer: boolean = false;
@@ -181,7 +181,7 @@
     const duration = DEFAULT_TRANSITION_DURATION;
     var moveDelayMultiplier = 1;
 
-    const moveSounds = [sndMove1, sndMove2].map(src => new GameAudio(src));
+    const moveSounds = [sndLocalMove, sndRemoteMove].map(src => new GameAudio(src));
 
     function playMoveSound() {
         const track = moveSounds[currentPlayer - 1];
