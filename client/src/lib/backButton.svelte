@@ -3,7 +3,6 @@
   import { DEFAULT_TRANSITION_DURATION } from './config';
 
   export let href: string | undefined = undefined;
-  export let onclick: svelte.JSX.MouseEventHandler<HTMLAnchorElement> | undefined = undefined;
 
   const duration = DEFAULT_TRANSITION_DURATION;
 </script>
@@ -11,7 +10,7 @@
 <a
   transition:fly={{ duration, delay: duration * 0.5, x: -60, opacity: 0 }}
   {href}
-  on:click={onclick}
+  on:click
   class="text-black dark:text-white arrow-back fixed top-0 left-0 w-4 h-4 m-4 p-2 transform transition-transform hover:-translate-x-1"
 >
   <svg width="16" height="16">

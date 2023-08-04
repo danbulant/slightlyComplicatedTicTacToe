@@ -192,7 +192,7 @@
 
 <svelte:window bind:innerWidth bind:innerHeight on:click={() => hoveredPiece = null} />
 
-<BackButton href="/" onclick={check}/>
+    <BackButton href="/" on:click={check}/>
 
 {#if !twoPlayer}
     <!-- I have no idea why x is inverted here -->
